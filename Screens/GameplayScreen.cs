@@ -10,6 +10,7 @@ using DungeonDweller.Sprites;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 using System.Reflection.Metadata;
 using SharpDX.Direct2D1;
+using Microsoft.Xna.Framework.Audio;
 
 
 
@@ -50,6 +51,8 @@ namespace DungeonDweller.Screens
         private int HeroHealth = 3;
 
         private float _DamageTimer = 0;
+
+        private SoundEffect _Hurt;
 
         public GameplayScreen()
         {
@@ -92,6 +95,7 @@ namespace DungeonDweller.Screens
             foreach (ISprite s in _foregroundSprites) s.LoadContent(_content);
 
             _gameFont = _content.Load<SpriteFont>("MenuFont");
+            _Hurt = _content.Load<SoundEffect>("Snap");
 
             // A real game would probably have more content than this sample, so
             // it would take longer to load. We simulate that by delaying for a
@@ -257,6 +261,7 @@ namespace DungeonDweller.Screens
                             if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
                             {
                                 HeroHealth--;
+                                _Hurt.Play();
                                 _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
                             }
 

@@ -16,6 +16,7 @@ namespace DungeonDweller.Screens
         Video _video;
         VideoPlayer _videoPlayer;
         bool _isPlaying = false;
+        private Song _backGround;
 
         string _videoname;
 
@@ -41,9 +42,11 @@ namespace DungeonDweller.Screens
 
             }
 
+            _backGround = _content.Load<Song>("GearShiftWIP");
             _video = _content.Load<Video>(_videoname);
             _videoPlayer.Play(_video);
-
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(_backGround);
             _isPlaying = true;
         }
 
