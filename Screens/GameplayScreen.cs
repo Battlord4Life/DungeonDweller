@@ -5,6 +5,14 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using DungeonDweller.Archetecture;
+using System.Collections.Generic;
+using DungeonDweller.Sprites;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
+using System.Reflection.Metadata;
+using SharpDX.Direct2D1;
+
+
+
 
 namespace DungeonDweller.Screens
 {
@@ -24,6 +32,25 @@ namespace DungeonDweller.Screens
         private float _pauseAlpha;
         private readonly InputAction _pauseAction;
 
+        private InputManager _inputManager;
+
+        private ISprite _backgroundSprite;
+
+        private List<ISprite> _backmidgroundSprites;
+
+        private List<ISprite> _midgroundSprites;
+
+        private List<ISprite> _foremidgroundSprites;
+
+        private List<ISprite> _foregroundSprites;
+
+
+        private bool _custBackground = true;
+
+        private int HeroHealth = 3;
+
+        private float _DamageTimer = 0;
+
         public GameplayScreen()
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
@@ -32,6 +59,14 @@ namespace DungeonDweller.Screens
             _pauseAction = new InputAction(
                 new[] { Buttons.Start, Buttons.Back },
                 new[] { Keys.Back, Keys.Escape }, true);
+
+            _inputManager = new();
+            
+            
+            _backmidgroundSprites = new();
+            _midgroundSprites = new();
+            _foremidgroundSprites = new();
+            _foregroundSprites = new();
         }
 
         // Load graphics content for the game
@@ -39,6 +74,22 @@ namespace DungeonDweller.Screens
         {
             if (_content == null)
                 _content = new ContentManager(ScreenManager.Game.Services, "Content");
+
+            _inputManager = new();
+
+
+            _backgroundSprite = new DungeonDweller.Sprites.Background(new Vector2(0, 0));
+
+            _foremidgroundSprites.Add(new Hero(new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2), _inputManager));
+            _foremidgroundSprites.Add(new Flame(new Vector2(50, ScreenManager.GraphicsDevice.Viewport.Height / 2), ScreenManager.GraphicsDevice.Viewport.Height / 2, false));
+            _foremidgroundSprites.Add(new Flame(new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 150, ScreenManager.GraphicsDevice.Viewport.Height / 2), ScreenManager.GraphicsDevice.Viewport.Height / 2, true));
+
+
+            if (_custBackground) _backgroundSprite.LoadContent(_content);
+            foreach (ISprite s in _backmidgroundSprites) s.LoadContent(_content);
+            foreach (ISprite s in _midgroundSprites) s.LoadContent(_content);
+            foreach (ISprite s in _foremidgroundSprites) s.LoadContent(_content);
+            foreach (ISprite s in _foregroundSprites) s.LoadContent(_content);
 
             _gameFont = _content.Load<SpriteFont>("MenuFont");
 
@@ -68,7 +119,10 @@ namespace DungeonDweller.Screens
         // stop updating when the pause menu is active, or if you tab away to a different application.
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
+
             base.Update(gameTime, otherScreenHasFocus, false);
+
+
 
             // Gradually fade in or out depending on whether we are covered by the pause screen.
             if (coveredByOtherScreen)
@@ -78,19 +132,19 @@ namespace DungeonDweller.Screens
 
             if (IsActive)
             {
+
+                _inputManager.Update(gameTime);
                 // Apply some random jitter to make the enemy move around.
-                const float randomization = 10;
+                if (_custBackground) _backgroundSprite.Update(gameTime);
+                foreach (ISprite s in _backmidgroundSprites) s.Update(gameTime);
+                foreach (ISprite s in _midgroundSprites) s.Update(gameTime);
+                foreach (ISprite s in _foremidgroundSprites) s.Update(gameTime);
+                foreach (ISprite s in _foregroundSprites) s.Update(gameTime);
+                // TODO: Add your update logic here
 
-                _enemyPosition.X += (float)(_random.NextDouble() - 0.5) * randomization;
-                _enemyPosition.Y += (float)(_random.NextDouble() - 0.5) * randomization;
+                CollisionChecker(_foremidgroundSprites, gameTime);
 
-                // Apply a stabilizing force to stop the enemy moving off the screen.
-                var targetPosition = new Vector2(
-                    ScreenManager.GraphicsDevice.Viewport.Width / 2 - _gameFont.MeasureString("Insert Gameplay Here").X / 2,
-                    200);
-
-                _enemyPosition = Vector2.Lerp(_enemyPosition, targetPosition, 0.05f);
-
+                if (HeroHealth <= 0) _inputManager.Active = false;
                 // This game isn't very fun! You could probably improve
                 // it by inserting something more interesting in this space :-)
             }
@@ -158,9 +212,24 @@ namespace DungeonDweller.Screens
 
             spriteBatch.Begin();
 
-            spriteBatch.DrawString(_gameFont, "// TODO", _playerPosition, Color.Green);
-            spriteBatch.DrawString(_gameFont, "Insert Gameplay Here",
-                                   _enemyPosition, Color.DarkRed);
+
+            if (_custBackground) _backgroundSprite.Draw(gameTime, spriteBatch);
+            foreach (ISprite s in _backmidgroundSprites) s.Draw(gameTime, spriteBatch);
+            foreach (ISprite s in _midgroundSprites) s.Draw(gameTime, spriteBatch);
+            foreach (ISprite s in _foremidgroundSprites) s.Draw(gameTime, spriteBatch);
+            foreach (ISprite s in _foregroundSprites) s.Draw(gameTime, spriteBatch);
+
+
+            spriteBatch.DrawString(_gameFont, "Test Damage", new Vector2(0, 0), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(_gameFont, HeroHealth.ToString() + "/3", new Vector2(0, 20), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(_gameFont, ((float)(Math.Max(0, _DamageTimer - gameTime.TotalGameTime.TotalSeconds))).ToString(), new Vector2(0, 40), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+
+            if (HeroHealth <= 0)
+            {
+                spriteBatch.DrawString(_gameFont, "You Are Dead!", new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 2), ScreenManager.GraphicsDevice.Viewport.Height - 200), Color.White, 0, new Vector2(63, 10), 3.5f, SpriteEffects.None, 0);
+                spriteBatch.DrawString(_gameFont, "ESC while you can!", new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 2), ScreenManager.GraphicsDevice.Viewport.Height - 100), Color.White, 0, new Vector2(63, 10), 3.5f, SpriteEffects.None, 0);
+            }
+
 
             spriteBatch.End();
 
@@ -170,6 +239,31 @@ namespace DungeonDweller.Screens
                 float alpha = MathHelper.Lerp(1f - TransitionAlpha, 1f, _pauseAlpha / 2);
 
                 ScreenManager.FadeBackBufferToBlack(alpha);
+            }
+        }
+
+        private void CollisionChecker(List<ISprite> Collection, GameTime gameTime)
+        {
+            for (int i = 0; i < Collection.Count; i++)
+            {
+                for (int j = i + 1; j < Collection.Count; j++)
+                {
+                    if (Collection[i].Collides(Collection[j]))
+                    {
+
+                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "Flame" || Collection[j].Name == "Flame")))
+                        {
+
+                            if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
+                            {
+                                HeroHealth--;
+                                _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
+                            }
+
+                        }
+
+                    }
+                }
             }
         }
     }
