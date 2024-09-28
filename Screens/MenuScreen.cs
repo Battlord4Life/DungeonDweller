@@ -17,11 +17,16 @@ namespace DungeonDweller.Screens
 
         private readonly InputAction _menuUp;
         private readonly InputAction _menuDown;
+        private readonly InputAction _menuRight;
+        private readonly InputAction _menuLeft;
         private readonly InputAction _menuSelect;
         private readonly InputAction _menuCancel;
 
         // Gets the list of menu entries, so derived classes can add or change the menu contents.
         protected IList<MenuEntry> MenuEntries => _menuEntries;
+        protected int SelectedEntry => _selectedEntry;
+
+        protected string MenuTitle => _menuTitle;
 
         protected MenuScreen(string menuTitle)
         {
@@ -36,6 +41,12 @@ namespace DungeonDweller.Screens
             _menuDown = new InputAction(
                 new[] { Buttons.DPadDown, Buttons.LeftThumbstickDown },
                 new[] { Keys.Down }, true);
+            _menuRight = new InputAction(
+                new[] { Buttons.DPadRight, Buttons.LeftThumbstickRight },
+                new[] { Keys.Right }, true);
+            _menuLeft = new InputAction(
+                new[] { Buttons.DPadLeft, Buttons.LeftThumbstickLeft },
+                new[] { Keys.Left }, true);
             _menuSelect = new InputAction(
                 new[] { Buttons.A, Buttons.Start },
                 new[] { Keys.Enter, Keys.Space }, true);
@@ -54,7 +65,7 @@ namespace DungeonDweller.Screens
             // OnSelectEntry and OnCancel, so they can tell which player triggered them.
             PlayerIndex playerIndex;
 
-            if (_menuUp.Occurred(input, ControllingPlayer, out playerIndex))
+            if (_menuUp.Occurred(input, ControllingPlayer, out playerIndex) || _menuLeft.Occurred(input, ControllingPlayer, out playerIndex))
             {
                 _selectedEntry--;
 
@@ -62,7 +73,7 @@ namespace DungeonDweller.Screens
                     _selectedEntry = _menuEntries.Count - 1;
             }
 
-            if (_menuDown.Occurred(input, ControllingPlayer, out playerIndex))
+            if (_menuDown.Occurred(input, ControllingPlayer, out playerIndex) || _menuRight.Occurred(input, ControllingPlayer, out playerIndex))
             {
                 _selectedEntry++;
 
