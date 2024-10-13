@@ -11,7 +11,6 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 using System.Reflection.Metadata;
 using SharpDX.Direct2D1;
 using Microsoft.Xna.Framework.Audio;
-using SharpDX.MediaFoundation;
 
 
 
@@ -21,15 +20,13 @@ namespace DungeonDweller.Screens
     // This screen implements the actual game logic. It is just a
     // placeholder to get the idea across: you'll probably want to
     // put some more interesting gameplay in here!
-    public class GameplayScreen : GameScreen
+    public class GameplayScreenDemo : GameScreen
     {
         private ContentManager _content;
         private SpriteFont _gameFont;
 
         private Vector2 _playerPosition = new Vector2(100, 100);
         private Vector2 _enemyPosition = new Vector2(100, 100);
-
-
 
         private readonly Random _random = new Random();
 
@@ -48,8 +45,7 @@ namespace DungeonDweller.Screens
 
         private List<ISprite> _foregroundSprites;
 
-
-        private float zoom = 1f;
+        RainParticleSystem _rain;
 
 
         private bool _custBackground = true;
@@ -60,7 +56,7 @@ namespace DungeonDweller.Screens
 
         private SoundEffect _Hurt;
 
-        public GameplayScreen()
+        public GameplayScreenDemo()
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
@@ -70,7 +66,6 @@ namespace DungeonDweller.Screens
                 new[] { Keys.Back, Keys.Escape }, true);
 
             _inputManager = new();
-            
             
             
             _backmidgroundSprites = new();
@@ -88,15 +83,14 @@ namespace DungeonDweller.Screens
             _inputManager = new();
 
 
+            
 
-            _backgroundSprite = new DungeonDweller.Sprites.Background(new Vector2(0, 0));
+            /*_backgroundSprite = new DungeonDweller.Sprites.Background(new Vector2(0, 0));
 
             _foremidgroundSprites.Add(new Hero(new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2), _inputManager));
             _foremidgroundSprites.Add(new Flame(new Vector2(50, ScreenManager.GraphicsDevice.Viewport.Height / 2), ScreenManager.GraphicsDevice.Viewport.Height / 2, false));
             _foremidgroundSprites.Add(new Flame(new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 150, ScreenManager.GraphicsDevice.Viewport.Height / 2), ScreenManager.GraphicsDevice.Viewport.Height / 2, true));
-
-            RainParticleSystem rain = new(ScreenManager.Game, new(0, 0, 1000, 10));
-            ScreenManager.Game.Components.Add(rain);
+            */
 
             if (_custBackground) _backgroundSprite.LoadContent(_content);
             foreach (ISprite s in _backmidgroundSprites) s.LoadContent(_content);
@@ -105,7 +99,8 @@ namespace DungeonDweller.Screens
             foreach (ISprite s in _foregroundSprites) s.LoadContent(_content);
 
             _gameFont = _content.Load<SpriteFont>("MenuFont");
-            _Hurt = _content.Load<SoundEffect>("Snap");
+            //_Hurt = _content.Load<SoundEffect>("Snap");
+
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
@@ -216,23 +211,10 @@ namespace DungeonDweller.Screens
             // This game has a blue background. Why? Because!
             ScreenManager.GraphicsDevice.Clear(ClearOptions.Target, Color.CornflowerBlue, 0, 0);
 
-
-
             // Our player and enemy are both actually just text strings.
             var spriteBatch = ScreenManager.SpriteBatch;
 
-
-
-            Matrix zoomTranslation = Matrix.CreateTranslation(1000f / 2, 750f / 2, 0);
-
-            zoom += RandomHelper.NextFloat(-.001f, .001f);
-            if (zoom >= 1.25f) zoom = 1.25f;
-            if (zoom <= .75f) zoom = 0.75f;
-            Matrix zoomScale = Matrix.CreateScale(zoom);
-
-            Matrix zoomTransform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation);
-
-            spriteBatch.Begin(transformMatrix: zoomTransform);
+            spriteBatch.Begin();
 
 
             if (_custBackground) _backgroundSprite.Draw(gameTime, spriteBatch);
@@ -241,16 +223,7 @@ namespace DungeonDweller.Screens
             foreach (ISprite s in _foremidgroundSprites) s.Draw(gameTime, spriteBatch);
             foreach (ISprite s in _foregroundSprites) s.Draw(gameTime, spriteBatch);
 
-
-            spriteBatch.DrawString(_gameFont, "Test Damage", new Vector2(0, 0), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(_gameFont, HeroHealth.ToString() + "/3", new Vector2(0, 20), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(_gameFont, ((float)(Math.Max(0, _DamageTimer - gameTime.TotalGameTime.TotalSeconds))).ToString(), new Vector2(0, 40), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-
-            if (HeroHealth <= 0)
-            {
-                spriteBatch.DrawString(_gameFont, "You Are Dead!", new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 2), ScreenManager.GraphicsDevice.Viewport.Height - 200), Color.White, 0, new Vector2(63, 10), 3.5f, SpriteEffects.None, 0);
-                spriteBatch.DrawString(_gameFont, "ESC while you can!", new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 2), ScreenManager.GraphicsDevice.Viewport.Height - 100), Color.White, 0, new Vector2(63, 10), 3.5f, SpriteEffects.None, 0);
-            }
+            
 
 
             spriteBatch.End();
@@ -273,17 +246,7 @@ namespace DungeonDweller.Screens
                     if (Collection[i].Collides(Collection[j]))
                     {
 
-                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "Flame" || Collection[j].Name == "Flame")))
-                        {
-
-                            if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
-                            {
-                                HeroHealth--;
-                                _Hurt.Play();
-                                _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
-                            }
-
-                        }
+                       
 
                     }
                 }

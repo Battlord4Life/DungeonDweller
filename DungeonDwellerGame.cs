@@ -17,6 +17,10 @@ namespace DungeonDweller
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
 
+            _graphics.PreferredBackBufferHeight = 750;
+            _graphics.PreferredBackBufferWidth = 1000;
+
+
             var screenFactory = new ScreenFactory();
             Services.AddService(typeof(IScreenFactory), screenFactory);
 
