@@ -51,7 +51,7 @@ namespace DungeonDweller.Screens
                     break;
             }
 
-            LoadingScreen.Load(ScreenManager, false, null, Lev);
+            LoadingScreen.Load(ScreenManager, false, Microsoft.Xna.Framework.PlayerIndex.One, Lev);
         }
 
         // This uses the loading screen to transition from the game back to the main menu screen.
