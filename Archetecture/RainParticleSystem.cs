@@ -43,7 +43,7 @@ namespace DungeonDweller.Archetecture
         {
 
 
-            p.Initialize(where, Vector2.UnitY * 260, Vector2.Zero, color, scale: RandomHelper.NextFloat(0.1f, 0.4f), lifetime: 3);
+            p.Initialize(where, Vector2.UnitY * 260, Vector2.Zero, color, scale: RandomHelper.NextFloat(0.1f, 0.4f), lifetime: 5);
         }
 
         public override void Update(GameTime gameTime)

@@ -21,7 +21,7 @@ namespace DungeonDweller.Screens
     // This screen implements the actual game logic. It is just a
     // placeholder to get the idea across: you'll probably want to
     // put some more interesting gameplay in here!
-    public class GameplayScreen : GameScreen
+    public class Level2 : GameScreen
     {
         private ContentManager _content;
         private SpriteFont _gameFont;
@@ -29,7 +29,7 @@ namespace DungeonDweller.Screens
         private Vector2 _playerPosition = new Vector2(100, 100);
         private Vector2 _enemyPosition = new Vector2(100, 100);
 
-
+        private Hero _hero;
 
         private readonly Random _random = new Random();
 
@@ -38,7 +38,7 @@ namespace DungeonDweller.Screens
 
         private InputManager _inputManager;
 
-        private ISprite _backgroundSprite;
+        private Tilemap _backgroundSprite;
 
         private List<ISprite> _backmidgroundSprites;
 
@@ -46,21 +46,24 @@ namespace DungeonDweller.Screens
 
         private List<ISprite> _foremidgroundSprites;
 
-        private List<ISprite> _foregroundSprites;
+        private LightTileMap _darkTileset;
 
+        private List<ISprite> _UISprites;
 
         private float zoom = 1f;
 
+        RainParticleSystem rain;
 
         private bool _custBackground = true;
 
         private int HeroHealth = 3;
+        private int MaxHeroHealth = 3;
 
         private float _DamageTimer = 0;
 
         private SoundEffect _Hurt;
 
-        public GameplayScreen()
+        public Level2()
         {
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
             TransitionOffTime = TimeSpan.FromSeconds(0.5);
@@ -76,7 +79,7 @@ namespace DungeonDweller.Screens
             _backmidgroundSprites = new();
             _midgroundSprites = new();
             _foremidgroundSprites = new();
-            _foregroundSprites = new();
+            _UISprites = new();
         }
 
         // Load graphics content for the game
@@ -89,20 +92,34 @@ namespace DungeonDweller.Screens
 
 
 
-            _backgroundSprite = new DungeonDweller.Sprites.Background(new Vector2(0, 0));
+            _backgroundSprite = new Tilemap("Level1Map.txt");
+            _darkTileset = new LightTileMap("LightMap.txt", _backgroundSprite);
+            _hero = new Hero(new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 20) * 10, (ScreenManager.GraphicsDevice.Viewport.Height / 20) * 10), _inputManager);
+            _foremidgroundSprites.Add(_hero);
+            _foremidgroundSprites.Add(new Flame(new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 20) * 2, (ScreenManager.GraphicsDevice.Viewport.Height / 20) * 10), (ScreenManager.GraphicsDevice.Viewport.Width / 20) * 5, false));
+            _foremidgroundSprites.Add(new Flame(new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 20) * 17, (ScreenManager.GraphicsDevice.Viewport.Height / 20) * 10), (ScreenManager.GraphicsDevice.Viewport.Width / 20) * 5, true));
 
-            _foremidgroundSprites.Add(new Hero(new Vector2(ScreenManager.GraphicsDevice.Viewport.Width / 2, ScreenManager.GraphicsDevice.Viewport.Height / 2), _inputManager));
-            _foremidgroundSprites.Add(new Flame(new Vector2(50, ScreenManager.GraphicsDevice.Viewport.Height / 2), ScreenManager.GraphicsDevice.Viewport.Height / 2, false));
-            _foremidgroundSprites.Add(new Flame(new Vector2(ScreenManager.GraphicsDevice.Viewport.Width - 150, ScreenManager.GraphicsDevice.Viewport.Height / 2), ScreenManager.GraphicsDevice.Viewport.Height / 2, true));
 
-            RainParticleSystem rain = new(ScreenManager.Game, new(0, 0, 1000, 10));
+
+            rain = new(ScreenManager.Game, new(0, 0, 1280, 10));
             ScreenManager.Game.Components.Add(rain);
 
             if (_custBackground) _backgroundSprite.LoadContent(_content);
             foreach (ISprite s in _backmidgroundSprites) s.LoadContent(_content);
             foreach (ISprite s in _midgroundSprites) s.LoadContent(_content);
             foreach (ISprite s in _foremidgroundSprites) s.LoadContent(_content);
-            foreach (ISprite s in _foregroundSprites) s.LoadContent(_content);
+            foreach (ISprite s in _UISprites) s.LoadContent(_content);
+            _darkTileset.LoadContent(_content);
+
+            
+            _hero.UpdateTile(_backgroundSprite);
+            HeroHealth = ScreenManager.GameSaveState.CurrHealth;
+            MaxHeroHealth = ScreenManager.GameSaveState.MaxHealth;
+            if (ScreenManager.GameSaveState.HasFlash) _hero.Items.Add("Flash");
+            if (ScreenManager.GameSaveState.HasLantern) _hero.Items.Add("Lant");
+            if (ScreenManager.GameSaveState.HasCamera) _hero.Items.Add("Cam");
+
+
 
             _gameFont = _content.Load<SpriteFont>("MenuFont");
             _Hurt = _content.Load<SoundEffect>("Snap");
@@ -132,6 +149,10 @@ namespace DungeonDweller.Screens
             base.Update(gameTime, otherScreenHasFocus, false);
 
 
+            if (!otherScreenHasFocus && !coveredByOtherScreen && !ScreenManager.Game.Components.Contains(rain))
+            {
+                ScreenManager.Game.Components.Add(rain);
+            }
 
             // Gradually fade in or out depending on whether we are covered by the pause screen.
             if (coveredByOtherScreen)
@@ -141,17 +162,40 @@ namespace DungeonDweller.Screens
 
             if (IsActive)
             {
-
+                _darkTileset.Reset();
                 _inputManager.Update(gameTime);
+                
+
                 // Apply some random jitter to make the enemy move around.
-                if (_custBackground) _backgroundSprite.Update(gameTime);
+                //if (_custBackground) _backgroundSprite.Update(gameTime);
                 foreach (ISprite s in _backmidgroundSprites) s.Update(gameTime);
                 foreach (ISprite s in _midgroundSprites) s.Update(gameTime);
                 foreach (ISprite s in _foremidgroundSprites) s.Update(gameTime);
-                foreach (ISprite s in _foregroundSprites) s.Update(gameTime);
+                foreach (ISprite s in _UISprites) s.Update(gameTime);
+                _darkTileset.Update(gameTime);
+
+                foreach (ISprite s in _backmidgroundSprites) s.UpdateLightMap(_darkTileset);
+                foreach (ISprite s in _midgroundSprites) s.UpdateLightMap(_darkTileset);
+                foreach (ISprite s in _foremidgroundSprites) s.UpdateLightMap(_darkTileset);
+                foreach (ISprite s in _UISprites) s.UpdateLightMap(_darkTileset);
                 // TODO: Add your update logic here
 
+                //if (!_hero.Items.Contains("Lant")) if ((_hero.Position / _backgroundSprite._tileWidth) == new Vector2(10, 9)) _hero.Items.Add("Lant");
+                //if (!_hero.Items.Contains("Cam")) if((_hero.Position/_backgroundSprite._tileWidth) == new Vector2(19, 19)) _hero.Items.Add("Cam");
+
                 CollisionChecker(_foremidgroundSprites, gameTime);
+
+                Vector2 XY = _hero.Position / _backgroundSprite._tileWidth;
+
+                if(_backgroundSprite.IsHaz((int)XY.X, (int)XY.Y))
+                {
+                    if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
+                    {
+                        HeroHealth--;
+                        _Hurt.Play();
+                        _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
+                    }
+                }
 
                 if (HeroHealth <= 0) _inputManager.Active = false;
                 // This game isn't very fun! You could probably improve
@@ -180,7 +224,8 @@ namespace DungeonDweller.Screens
             PlayerIndex player;
             if (_pauseAction.Occurred(input, ControllingPlayer, out player) || gamePadDisconnected)
             {
-                ScreenManager.AddScreen(new PauseMenuScreen(), ControllingPlayer);
+                ScreenManager.Game.Components.Remove(rain);
+                ScreenManager.AddScreen(new PauseMenuScreen(2), ControllingPlayer);
             }
             else
             {
@@ -223,7 +268,7 @@ namespace DungeonDweller.Screens
 
 
 
-            Matrix zoomTranslation = Matrix.CreateTranslation(1000f / 2, 750f / 2, 0);
+            Matrix zoomTranslation = Matrix.CreateTranslation(ScreenManager.GraphicsDevice.Viewport.Width /2 , ScreenManager.GraphicsDevice.Viewport.Height / 2, 0);
 
             zoom += RandomHelper.NextFloat(-.001f, .001f);
             if (zoom >= 1.25f) zoom = 1.25f;
@@ -231,26 +276,38 @@ namespace DungeonDweller.Screens
             Matrix zoomScale = Matrix.CreateScale(zoom);
 
             Matrix zoomTransform = zoomTranslation * zoomScale * Matrix.Invert(zoomTranslation);
-
-            spriteBatch.Begin(transformMatrix: zoomTransform);
+            //transformMatrix: zoomTransform
+            spriteBatch.Begin();
 
 
             if (_custBackground) _backgroundSprite.Draw(gameTime, spriteBatch);
             foreach (ISprite s in _backmidgroundSprites) s.Draw(gameTime, spriteBatch);
             foreach (ISprite s in _midgroundSprites) s.Draw(gameTime, spriteBatch);
             foreach (ISprite s in _foremidgroundSprites) s.Draw(gameTime, spriteBatch);
-            foreach (ISprite s in _foregroundSprites) s.Draw(gameTime, spriteBatch);
+            _darkTileset.Draw(gameTime, spriteBatch);
+            foreach (ISprite s in _UISprites) s.Draw(gameTime, spriteBatch);
 
 
-            spriteBatch.DrawString(_gameFont, "Test Damage", new Vector2(0, 0), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(_gameFont, HeroHealth.ToString() + "/3", new Vector2(0, 20), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+
+
+            spriteBatch.DrawString(_gameFont, "Level 2", new Vector2(0, 0), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(_gameFont, HeroHealth.ToString() + "/" + MaxHeroHealth.ToString(), new Vector2(0, 20), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
             spriteBatch.DrawString(_gameFont, ((float)(Math.Max(0, _DamageTimer - gameTime.TotalGameTime.TotalSeconds))).ToString(), new Vector2(0, 40), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+
+            int displace = 0;
+            
+            foreach(string s in _hero.Items)
+            {
+                spriteBatch.DrawString(_gameFont, s, new Vector2(ScreenManager.GraphicsDevice.Viewport.Width, displace), (displace/20) == _hero.SelectedItem ? Color.Yellow : Color.White, 0, new Vector2(_gameFont.MeasureString(s).X, 0), 1.5f, SpriteEffects.None, 0);
+                displace += 20;
+            }
 
             if (HeroHealth <= 0)
             {
                 spriteBatch.DrawString(_gameFont, "You Are Dead!", new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 2), ScreenManager.GraphicsDevice.Viewport.Height - 200), Color.White, 0, new Vector2(63, 10), 3.5f, SpriteEffects.None, 0);
                 spriteBatch.DrawString(_gameFont, "ESC while you can!", new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 2), ScreenManager.GraphicsDevice.Viewport.Height - 100), Color.White, 0, new Vector2(63, 10), 3.5f, SpriteEffects.None, 0);
             }
+
 
 
             spriteBatch.End();
@@ -288,6 +345,14 @@ namespace DungeonDweller.Screens
                     }
                 }
             }
+        }
+        private void OnLevelEnd()
+        {
+            ScreenManager.Game.Components.Remove(rain);
+            ScreenManager.GameSaveState.Level = 2;
+            ScreenManager.Save(ScreenManager.GameSaveState);
+            ScreenManager.AddScreen(new Level2(), ControllingPlayer);
+            ExitScreen();
         }
     }
 }

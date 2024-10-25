@@ -1,4 +1,5 @@
 ﻿using CollisionExample.Collisons;
+using DungeonDweller.Archetecture;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -43,6 +44,9 @@ namespace DungeonDweller.Sprites
         /// <param name="other">other object</param>
         /// <returns>Wether they collides</returns>
         public bool Collides(ISprite other);
+
+
+        public void UpdateLightMap(LightTileMap tm);
 
         public string Name { get; }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CollisionExample.Collisons;
+using DungeonDweller.Archetecture;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -37,7 +38,7 @@ namespace DungeonDweller.Sprites
         /// The flames's position in the world
         ///</summary>
         public Vector2 Position { get; private set; }
-        public BoundingRectangle Bounds { get => new(Position, 32 * _scale, 32 * _scale);}
+        public BoundingRectangle Bounds { get => new(new(Position.X + 16, Position.Y + 16), 16 * _scale, 16 * _scale);}
 
         public string Name => "Flame";
 
@@ -49,6 +50,10 @@ namespace DungeonDweller.Sprites
 
         private bool _hori;
 
+        private Vector2 Pointer = new(0,0);
+
+        bool _update = false;
+
         public Flame(Vector2 Pos, float Diff, bool flip)
         {
             _scale = 4;
@@ -58,6 +63,7 @@ namespace DungeonDweller.Sprites
             _speed = 100;
             _hori = flip;
             _falmeVel = new Vector2(0, 1) * _speed;
+
         }
 
         public void LoadContent(ContentManager content)
@@ -82,7 +88,7 @@ namespace DungeonDweller.Sprites
 
             // Determine the source rectangle 
             var sourceRect = new Rectangle(_animationFrame * 32 * _scale, 0, 32 * _scale, 32* _scale);
-
+            
             // Draw the bat using the current animation frame 
             spriteBatch.Draw(_texture, Position, sourceRect, Color.White);
         }
@@ -90,14 +96,56 @@ namespace DungeonDweller.Sprites
         public void Update(GameTime gameTime)
         {
             
-            Position += _falmeVel * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if (Position.Y > _minHeight || Position.Y < _maxHeight) _falmeVel.Y *= -1;
+            
+            Pointer += _falmeVel * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if(Pointer.X >= 64)
+            {
+                Position = new(Position.X + 64, Position.Y);
+                Pointer = new(0, Pointer.Y);
+                _update = false;
+            }
+            if (Pointer.X <= -64)
+            {
+                Position = new(Position.X - 64, Position.Y);
+                Pointer = new(0, Pointer.Y);
+                _update = false;
+            }
+            if (Pointer.Y >= 64)
+            {
+                Position = new(Position.X , Position.Y + 64);
+                Pointer = new(Pointer.X, 0);
+                _update = false;
+            }
+            if (Pointer.Y <= -64)
+            {
+                Position = new(Position.X, Position.Y - 64);
+                Pointer = new(Pointer.X, 0);
+                _update = false;
+            }
+            if ((Position.Y >= _minHeight || Position.Y <= _maxHeight) && !_update) 
+            { 
+                _falmeVel.Y *= -1;
+                _update = true;
+            }
             
         }
 
         public bool Collides(ISprite other)
         {
             return Bounds.CollidesWith(other.Bounds);
+        }
+
+        public void UpdateLightMap(LightTileMap tm)
+        {
+            int X = (int)(Position.X / 64);
+            int Y = (int)(Position.Y / 64);
+
+
+            tm.SetLight(X, Y, 4);
+            tm.SetLight(X+1, Y, 4);
+            tm.SetLight(X, Y+1, 4);
+            tm.SetLight(X+1, Y+1, 4);
+            
         }
     }
 }

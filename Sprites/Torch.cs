@@ -1,4 +1,5 @@
 ﻿using CollisionExample.Collisons;
+using DungeonDweller.Archetecture;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -42,6 +43,11 @@ namespace DungeonDweller.Sprites
         public bool Collides(ISprite other)
         {
             return false;
+        }
+
+        public void UpdateLightMap(LightTileMap tm)
+        {
+
         }
 
         public Torch(Vector2 Pos)

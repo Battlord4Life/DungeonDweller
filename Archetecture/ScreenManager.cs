@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,6 +21,8 @@ namespace DungeonDweller.Archetecture
         private readonly InputState _input = new InputState();
 
         private bool _isInitialized;
+
+        public GameSaveState GameSaveState { get; set; }
 
         /// <summary>
         /// A SpriteBatch shared by all GameScreens
@@ -186,5 +190,40 @@ namespace DungeonDweller.Archetecture
         {
             return false;
         }
+
+        public void Save(GameSaveState GSS)
+        {
+            string text = JsonSerializer.Serialize(GSS);
+            
+            File.WriteAllText("Save.json", text);
+
+        }
+
+        public GameSaveState Load()
+        {
+            if (File.Exists("Save.json"))
+            {
+
+                using (StreamReader sr = new("Save.json"))
+                {
+                    try
+                    {
+                        return JsonSerializer.Deserialize<GameSaveState>(sr.ReadToEnd());
+                    }
+                    catch
+                    {
+
+                        return new GameSaveState();
+                    }
+                }
+
+            }
+            else
+            {
+                return new GameSaveState();
+            }
+        }
+
     }
 }
+

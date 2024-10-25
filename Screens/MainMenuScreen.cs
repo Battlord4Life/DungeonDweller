@@ -9,20 +9,24 @@ namespace DungeonDweller.Screens
     // The main menu screen is the first thing displayed when the game starts up.
     public class MainMenuScreen : MenuScreen
     {
-        private MenuEntry[] _itemEntries = new MenuEntry[2];
+        private MenuEntry[] _itemEntries = new MenuEntry[3];
 
         public MainMenuScreen() : base("Main Menu")
         {
             var playGameMenuEntry = new MenuEntryImage("Play Game", "StartGear");
+            var NewGameMenuEntry = new MenuEntry("New Game");
             var exitMenuEntry = new MenuEntryImage("Exit", "ExitGear");
 
             playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
+            NewGameMenuEntry.Selected += NewGameMenuEntrySelected;
             exitMenuEntry.Selected += OnCancel;
 
             _itemEntries[0] = playGameMenuEntry;
-            _itemEntries[1] = exitMenuEntry;
+            _itemEntries[1] = NewGameMenuEntry;
+            _itemEntries[2] = exitMenuEntry;
 
             MenuEntries.Add(playGameMenuEntry);
+            MenuEntries.Add(NewGameMenuEntry);
             MenuEntries.Add(exitMenuEntry);
 
 
@@ -30,7 +34,23 @@ namespace DungeonDweller.Screens
 
         private void PlayGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
-            LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new GameplayScreen());
+            GameSaveState gss = ScreenManager.Load();
+            this.ScreenManager.GameSaveState = gss;
+
+            GameScreen Lev = new Level1();
+            switch (gss.Level)
+            {
+                case 2:
+                    Lev = new Level2();
+                    break;
+            }
+            LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, Lev);
+        }
+
+        private void NewGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
+        {
+            this.ScreenManager.GameSaveState = new GameSaveState();
+            LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new Level1());
         }
 
         protected override void OnCancel(PlayerIndex playerIndex)
@@ -64,8 +84,9 @@ namespace DungeonDweller.Screens
             for (int i = 0; i < MenuEntries.Count; i++)
             {
                 var menuEntry = MenuEntries[i];
-                if (menuEntry.Equals(_itemEntries[0])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 3), ScreenManager.GraphicsDevice.Viewport.Width / 2);
-                if (menuEntry.Equals(_itemEntries[1])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 3) * 2 , ScreenManager.GraphicsDevice.Viewport.Width / 2);
+                if (menuEntry.Equals(_itemEntries[0])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4), ScreenManager.GraphicsDevice.Viewport.Width / 2);
+                if (menuEntry.Equals(_itemEntries[1])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4) * 2, ScreenManager.GraphicsDevice.Viewport.Width / 2);
+                if (menuEntry.Equals(_itemEntries[2])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4) * 3 , ScreenManager.GraphicsDevice.Viewport.Width / 2);
 
 
                 bool isSelected = IsActive && i == SelectedEntry;
@@ -81,12 +102,12 @@ namespace DungeonDweller.Screens
             var titlePosition = new Vector2(graphics.Viewport.Width / 2, 80);
             var titleOrigin = font.MeasureString(MenuTitle) / 2;
             var titleColor = new Color(192, 192, 192) * TransitionAlpha;
-            const float titleScale = 1.25f;
+            float titleScale = 1.25f;
 
             titlePosition.Y -= transitionOffset * 100;
 
             spriteBatch.DrawString(font, MenuTitle, titlePosition, titleColor,
-                0, titleOrigin, titleScale, SpriteEffects.None, 0);
+                0, titleOrigin, titleScale*2, SpriteEffects.None, 0);
 
             spriteBatch.End();
         }

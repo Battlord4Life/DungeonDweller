@@ -34,7 +34,18 @@ namespace DungeonDweller.Archetecture
         /// </summary>
         public bool Exit { get; private set; }
 
-        public bool Jump { get; private set; }
+        public bool Flash { get; private set; }
+
+        public bool MoveUp { get; private set; }
+        public bool MoveLeft { get; private set; }
+        public bool MoveDown { get; private set; }
+        public bool MoveRight { get; private set; }
+
+
+        public bool Switch0 { get; private set; }
+        public bool Switch1 { get; private set; }
+        public bool Switch2 { get; private set; }
+        public bool Switch3 { get; private set; }
 
         /// <summary>
         /// Input if the player is Moving
@@ -87,6 +98,7 @@ namespace DungeonDweller.Archetecture
                     Moving = true;
                     Direction += new Vector2(0, -100 * (float)gameTime.ElapsedGameTime.TotalSeconds);
                     EnumDirection = direction.North;
+                    
                 }
                 if (currentKBState.IsKeyDown(Keys.Down) || currentKBState.IsKeyDown(Keys.S))
                 {
@@ -110,18 +122,97 @@ namespace DungeonDweller.Archetecture
 
                 #endregion
 
-                #region Jump Input
+                #region Flash Input
                 if ((currentKBState.IsKeyDown(Keys.Space) && !previousKBState.IsKeyDown(Keys.Space) || currentGPState.IsButtonDown(Buttons.A) && !previousGPState.IsButtonDown(Buttons.A)))
                 {
-                    Jump = true;
+                    Flash = true;
                 }
                 else
                 {
-                    Jump = false;
+                    Flash = false;
+                }
+                #endregion
+
+                #region Bool Direction Input
+
+                if ((currentKBState.IsKeyDown(Keys.Up) || currentKBState.IsKeyDown(Keys.W)) && !(previousKBState.IsKeyDown(Keys.Up) || previousKBState.IsKeyDown(Keys.W)))
+                {
+                    MoveUp = true;
+                }
+                else
+                {
+                    MoveUp = false;
+                }
+                if ((currentKBState.IsKeyDown(Keys.Down) || currentKBState.IsKeyDown(Keys.S)) && !(previousKBState.IsKeyDown(Keys.Down) || previousKBState.IsKeyDown(Keys.S)))
+
+                {
+                    MoveDown = true;
+                }
+                else
+                {
+                    MoveDown = false;
+                }
+                if ((currentKBState.IsKeyDown(Keys.Right) || currentKBState.IsKeyDown(Keys.D)) && !(previousKBState.IsKeyDown(Keys.Right) || previousKBState.IsKeyDown(Keys.D)))
+                {
+                    MoveRight = true;
+                }
+                else
+                {
+                    MoveRight = false;
+                }
+                if ((currentKBState.IsKeyDown(Keys.Left) || currentKBState.IsKeyDown(Keys.A)) && !(previousKBState.IsKeyDown(Keys.Left) || previousKBState.IsKeyDown(Keys.A)))
+
+                {
+                    MoveLeft = true;
+                }
+                else
+                {
+                    MoveLeft = false;
                 }
 
+                #endregion
+
+                #region Item Switching
+
+                if ((currentKBState.IsKeyDown(Keys.D0)) && !(previousKBState.IsKeyDown(Keys.D0)))
+                {
+                    Switch0 = true;
+
+                }
+                else
+                {
+                    Switch0 = false;
+                }
+                if ((currentKBState.IsKeyDown(Keys.D1)) && !(previousKBState.IsKeyDown(Keys.D1)))
+                {
+                    Switch1 = true;
+
+                }
+                else
+                {
+                    Switch1 = false;
+                }
+                if ((currentKBState.IsKeyDown(Keys.D2)) && !(previousKBState.IsKeyDown(Keys.D2)))
+                {
+                    Switch2 = true;
+
+                }
+                else
+                {
+                    Switch2 = false;
+                }
+                if ((currentKBState.IsKeyDown(Keys.D3)) && !(previousKBState.IsKeyDown(Keys.D3)))
+                {
+                    Switch3 = true;
+
+                }
+                else
+                {
+                    Switch3 = false;
+                }
 
                 #endregion
+
             }
             else
             {
