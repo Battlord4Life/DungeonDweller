@@ -61,7 +61,7 @@ namespace DungeonDweller.Sprites
 
         private Vector2 _heroVel;
 
-        private Tilemap _map;
+        private CusTilemap _map;
 
         public Hero(Vector2 Pos, InputManager input)
         {
@@ -109,7 +109,7 @@ namespace DungeonDweller.Sprites
             spriteBatch.Draw(_texture, Position, sourceRect, Color.White);
         }
 
-        public void UpdateTile(Tilemap tm)
+        public void UpdateTile(CusTilemap tm)
         {
             _map = tm;
         }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DungeonDweller.Archetecture
 {
-    public class Tilemap
+    public class CusTilemap
     {
 
         public int _tileWidth, _tileHeight, _mapWidth, _mapHeight;
@@ -33,7 +33,7 @@ namespace DungeonDweller.Archetecture
 
         string _filename;
 
-        public Tilemap(string fileName)
+        public CusTilemap(string fileName)
         {
             _filename = fileName;
         }

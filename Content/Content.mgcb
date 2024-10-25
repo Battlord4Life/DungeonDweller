@@ -164,6 +164,12 @@
 /processorParam:TextureFormat=Color
 /build:hflame-spritesheet-32x32.png
 
+#begin Level1Map2.txt
+/importer:TxtImporter
+/processor:TextTilemapProcessor
+/processorParam:Scale=1
+/build:Level1Map2.txt
+
 #begin MainMenuBG.avi
 /importer:H264Importer
 /processor:VideoProcessor

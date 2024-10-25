@@ -38,7 +38,7 @@ namespace DungeonDweller.Screens
 
         private InputManager _inputManager;
 
-        private Tilemap _backgroundSprite;
+        private CusTilemap _backgroundSprite;
 
         private List<ISprite> _backmidgroundSprites;
 
@@ -93,7 +93,7 @@ namespace DungeonDweller.Screens
 
 
 
-            _backgroundSprite = new Tilemap("Level1Map.txt");
+            _backgroundSprite = new CusTilemap("Level1Map.txt");
             _darkTileset = new LightTileMap("LightMap.txt", _backgroundSprite);
             _hero = new Hero(new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 20) * 10, (ScreenManager.GraphicsDevice.Viewport.Height / 20) * 10), _inputManager);
             _foremidgroundSprites.Add(_hero);
