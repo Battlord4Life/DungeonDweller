@@ -50,6 +50,8 @@ namespace DungeonDweller.Sprites
 
         public string Name { get; }
 
+        public Vector2 Position { get; set; }
+
 
     }
         

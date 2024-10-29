@@ -46,6 +46,9 @@ namespace DungeonDweller.Archetecture
         public bool Switch1 { get; private set; }
         public bool Switch2 { get; private set; }
         public bool Switch3 { get; private set; }
+        public bool Switch4 { get; private set; }
+
+        public bool Refill { get; private set; }
 
         /// <summary>
         /// Input if the player is Moving
@@ -174,7 +177,7 @@ namespace DungeonDweller.Archetecture
 
                 #region Item Switching
 
-                if ((currentKBState.IsKeyDown(Keys.D0)) && !(previousKBState.IsKeyDown(Keys.D0)))
+                if ((currentKBState.IsKeyDown(Keys.D1)) && !(previousKBState.IsKeyDown(Keys.D1)))
                 {
                     Switch0 = true;
 
@@ -183,7 +186,7 @@ namespace DungeonDweller.Archetecture
                 {
                     Switch0 = false;
                 }
-                if ((currentKBState.IsKeyDown(Keys.D1)) && !(previousKBState.IsKeyDown(Keys.D1)))
+                if ((currentKBState.IsKeyDown(Keys.D2)) && !(previousKBState.IsKeyDown(Keys.D2)))
                 {
                     Switch1 = true;
 
@@ -192,7 +195,7 @@ namespace DungeonDweller.Archetecture
                 {
                     Switch1 = false;
                 }
-                if ((currentKBState.IsKeyDown(Keys.D2)) && !(previousKBState.IsKeyDown(Keys.D2)))
+                if ((currentKBState.IsKeyDown(Keys.D3)) && !(previousKBState.IsKeyDown(Keys.D3)))
                 {
                     Switch2 = true;
 
@@ -201,7 +204,7 @@ namespace DungeonDweller.Archetecture
                 {
                     Switch2 = false;
                 }
-                if ((currentKBState.IsKeyDown(Keys.D3)) && !(previousKBState.IsKeyDown(Keys.D3)))
+                if ((currentKBState.IsKeyDown(Keys.D4)) && !(previousKBState.IsKeyDown(Keys.D4)))
                 {
                     Switch3 = true;
 
@@ -209,6 +212,29 @@ namespace DungeonDweller.Archetecture
                 else
                 {
                     Switch3 = false;
+                }
+                if ((currentKBState.IsKeyDown(Keys.D5)) && !(previousKBState.IsKeyDown(Keys.D5)))
+                {
+                    Switch4 = true;
+
+                }
+                else
+                {
+                    Switch4 = false;
+                }
+
+                #endregion
+
+                #region Refill
+
+                if ((currentKBState.IsKeyDown(Keys.R)) && !(previousKBState.IsKeyDown(Keys.R)))
+                {
+                    Refill = true;
+
+                }
+                else
+                {
+                    Refill = false;
                 }
 
                 #endregion

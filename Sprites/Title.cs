@@ -21,7 +21,7 @@ namespace DungeonDweller.Sprites
         ///<summary>
         /// The flames's position in the world
         ///</summary>
-        public Vector2 Position { get; private set; }
+        public Vector2 Position { get;  set; }
 
         public BoundingRectangle Bounds => new(0,0,0,0);
 

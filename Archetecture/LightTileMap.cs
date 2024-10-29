@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace DungeonDweller.Archetecture
 {
-    public class LightTileMap : CusTilemap
+    public class LightTileMap : Tilemap
     {
 
-        CusTilemap map;
+        Tilemap map;
 
         float Alpha = 1;
 
         bool FullAlpha = true;
-        public LightTileMap(string fileName, CusTilemap tm) : base(fileName)
+        public LightTileMap(string fileName, Tilemap tm) : base(fileName)
         {
             map = tm;
         }

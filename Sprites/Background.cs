@@ -19,7 +19,7 @@ namespace DungeonDweller.Sprites
         ///<summary>
         /// The Torches position in the world
         ///</summary>
-        public Vector2 Position { get; private set; }
+        public Vector2 Position { get; set; }
 
         //Not Used
         public BoundingRectangle Bounds { get => new(0,0,0,0);}

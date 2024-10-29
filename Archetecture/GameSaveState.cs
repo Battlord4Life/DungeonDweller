@@ -27,5 +27,11 @@ namespace DungeonDweller.Archetecture
         public int Kills { get; set; } = 0;
         public int MaxHealth { get; set; } = 5;
         public int CurrHealth { get; set; } = 5;
+
+        public int Bulbs { get; set; } = 3;
+
+        public int Batteries { get; set; } = 3;
+
+        public int Oil { get; set; } = 2;
     }
 }
