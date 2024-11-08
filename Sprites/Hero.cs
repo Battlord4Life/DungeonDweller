@@ -85,15 +85,17 @@ namespace DungeonDweller.Sprites
 
         public bool BulbBroken = false;
 
-        public double NightVisionLeft = 5f;
+        public double NightVisionLeft = 3f;
 
-        public double NightVisionTotal = 5F;
+        public double NightVisionTotal = 3F;
 
         public double NightVisionTracker = 0;
 
         public bool ToolActive = true;
 
         public bool UpdateSave = false;
+
+        public bool Idle = true;
 
 
         public Hero(Vector2 Pos, InputManager input)
@@ -166,62 +168,79 @@ namespace DungeonDweller.Sprites
             {
                 
                 if(!_map.IsWall((int)XY.X, (int)XY.Y - 1)) Position = new(Position.X , Position.Y - 64f);
+                Idle = false;
             }
             if (_inputMan.MoveLeft)
             {
                 if (!_map.IsWall((int)XY.X-1, (int)XY.Y)) Position = new(Position.X - 64f, Position.Y);
+                Idle = false;
+
             }
             if (_inputMan.MoveRight)
             {
                 if (!_map.IsWall((int)XY.X +1, (int)XY.Y)) Position = new(Position.X + 64f, Position.Y);
+                Idle = false;
+
             }
             if (_inputMan.MoveDown)
             {
                 if (!_map.IsWall((int)XY.X, (int)XY.Y + 1)) Position = new(Position.X, Position.Y + 64f);
+                Idle = false;
+
             }
-            if(_inputMan.Switch0 && Items.Contains("None"))
+            if (_inputMan.Switch0 && Items.Contains("None"))
             {
                 SelectedItem = 0;
                 ToolActive = false;
+                Idle = false;
+
             }
             if (_inputMan.Switch1 && Items.Contains("Flashlight"))
             {
                 SelectedItem = 1;
                 
                 ToolActive = FlashlightLeft > 0f;
+                Idle = false;
+
             }
             if (_inputMan.Switch2 && Items.Contains("Lantern"))
             {
                 SelectedItem = 2;
                 ToolActive = LanternLeft > 0f;
+                Idle = false;
+
             }
             if (_inputMan.Switch3 && Items.Contains("Camera"))
             {
                 SelectedItem = 3;
                 ToolActive = !BulbBroken;
+                Idle = false;
+
             }
-            if (_inputMan.Switch3 && Items.Contains("Night Vision"))
+            if (_inputMan.Switch4 && Items.Contains("Night Vision"))
             {
                 SelectedItem = 4;
                 ToolActive = NightVisionLeft > 0f;
+                Idle = false;
+
             }
 
             switch (SelectedItem)
             {
                 case 1:
-                    if (FlashlightLeft > 0) FlashlightLeft -= gameTime.ElapsedGameTime.TotalSeconds;
+                    if (FlashlightLeft > 0) { if (!Idle) FlashlightLeft -= gameTime.ElapsedGameTime.TotalSeconds; }
                     else ToolActive = false;
                     
                     break;
 
                 case 2:
-                    if (LanternLeft > 0) LanternLeft -= gameTime.ElapsedGameTime.TotalSeconds;
+                    if (LanternLeft > 0) { if(!Idle) LanternLeft -= gameTime.ElapsedGameTime.TotalSeconds; }
                     else ToolActive = false;
 
                     break;
 
                 case 4:
-                    if (NightVisionLeft > 0) NightVisionLeft -= gameTime.ElapsedGameTime.TotalSeconds;
+                    if (NightVisionLeft > 0) { if (!Idle) NightVisionLeft -= gameTime.ElapsedGameTime.TotalSeconds; }
                     else ToolActive = false;
 
                     break;
@@ -393,13 +412,19 @@ namespace DungeonDweller.Sprites
                     if (_inputMan.Flash)
                     {
                         tm.Flash();
+                        Idle = false;
                         CameraUse++;
                         int temp = RandomHelper.Next(1, 4);
                         if(temp < CameraUse)
                         {
                             BulbBroken = true;
+                            ToolActive = false;
                         }
                     }
+                }
+                if(SelectedItem == 4)
+                {
+                    tm.Flash();
                 }
             }
 

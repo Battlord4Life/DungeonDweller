@@ -39,14 +39,19 @@ namespace DungeonDweller.Archetecture
         /// </summary>
         public Texture2D BlankTexture { get; private set; }
 
+        public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
+
         /// <summary>
         /// Constructs a new ScreenManager
         /// </summary>
         /// <param name="game">The game this ScreenManager belongs to</param>
-        public ScreenManager(Game game) : base(game)
+        public ScreenManager(Game game, GraphicsDeviceManager GDM) : base(game)
         {
             _content = new ContentManager(game.Services, "Content");
+            GraphicsDeviceManager = GDM;
         }
+
+
 
         /// <summary>
         /// Initializes the ScreenManager

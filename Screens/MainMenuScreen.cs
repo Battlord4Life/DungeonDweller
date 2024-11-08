@@ -3,6 +3,7 @@ using DungeonDweller.Archetecture;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace DungeonDweller.Screens
 {
@@ -10,6 +11,11 @@ namespace DungeonDweller.Screens
     public class MainMenuScreen : MenuScreen
     {
         private MenuEntry[] _itemEntries = new MenuEntry[3];
+
+
+        Cube cube;
+
+        bool declarecube = false;
 
         public MainMenuScreen() : base("Main Menu")
         {
@@ -28,6 +34,7 @@ namespace DungeonDweller.Screens
             MenuEntries.Add(playGameMenuEntry);
             MenuEntries.Add(NewGameMenuEntry);
             MenuEntries.Add(exitMenuEntry);
+            
 
 
         }
@@ -47,9 +54,12 @@ namespace DungeonDweller.Screens
             LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, Lev);
         }
 
+        
+
         private void NewGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
             this.ScreenManager.GameSaveState = new GameSaveState();
+            ScreenManager.Save(new GameSaveState());
             LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new Level1());
         }
 
@@ -68,6 +78,17 @@ namespace DungeonDweller.Screens
             ScreenManager.Game.Exit();
         }
 
+        
+
+        public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
+        {
+            if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
+            declarecube = true;
+
+            cube.Update(gameTime);
+            base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
+        }
+
         public override void Draw(GameTime gameTime)
         {
 
@@ -77,9 +98,15 @@ namespace DungeonDweller.Screens
             var spriteBatch = ScreenManager.SpriteBatch;
             var font = ScreenManager.Font;
 
-            
+
+           
 
             spriteBatch.Begin();
+
+            if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
+            declarecube = true;
+
+            cube.Draw();
 
             for (int i = 0; i < MenuEntries.Count; i++)
             {

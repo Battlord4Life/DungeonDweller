@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX.Direct3D9;
 
 namespace DungeonDweller.Archetecture
 {
@@ -26,9 +27,16 @@ namespace DungeonDweller.Archetecture
         public bool SetLight(int x, int y, int light)
         {
             if (x >= _mapWidth || x < 0 || y >= _mapHeight || y < 0) return true;
-            _map[x, y] = light;
+            _map[x, y] = _map[x,y] == 1 || _map[x, y] == light ? light : 4;
             return map.IsWall(x, y);
             
+        }
+
+        public bool SetDark(int x, int y)
+        {
+            if (x >= _mapWidth || x < 0 || y >= _mapHeight || y < 0) return true;
+            _map[x, y] = 1;
+            return map.IsWall(x, y);
         }
 
         public void Reset()
@@ -46,7 +54,7 @@ namespace DungeonDweller.Archetecture
         {
             if (!FullAlpha)
             {
-                Alpha += .05f;
+                Alpha += .1f;
             }
             if(Alpha == 1)
             {
@@ -72,5 +80,7 @@ namespace DungeonDweller.Archetecture
             Alpha = 0;
             FullAlpha = false;
         }
+
+        
     }
 }

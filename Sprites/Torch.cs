@@ -29,7 +29,7 @@ namespace DungeonDweller.Sprites
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Position, Color.White);
+            spriteBatch.Draw(_texture, Position + new Vector2(16, 0), Color.White);
         }
 
         public void LoadContent(ContentManager content)

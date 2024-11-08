@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 namespace DungeonDweller.Archetecture
@@ -86,5 +88,12 @@ namespace DungeonDweller.Archetecture
                 NextFloat(bounds.Y, bounds.Y + bounds.Height)
                 );
         }
+
+        public static object RandomFromList(IList list)
+        {
+            return list[Next(list.Count)];
+        }
+
+        
     }
 }
