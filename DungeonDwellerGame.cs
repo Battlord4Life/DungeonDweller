@@ -32,7 +32,7 @@ namespace DungeonDweller
 
         private void AddInitialScreens()
         {
-            LoadingScreen.Load(_screenManager, true, PlayerIndex.One, new BackgroundScreenAnim("MainMenuBG"), new MainMenuScreen());
+            LoadingScreen.Load(_screenManager, true, PlayerIndex.One, new BackgroundScreen(), new MainMenuScreen());
             //_screenManager.AddScreen(new SplashScreen(), null);
         }
 

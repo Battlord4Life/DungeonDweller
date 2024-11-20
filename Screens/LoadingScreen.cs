@@ -1,6 +1,8 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using DungeonDweller.Archetecture;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
 
 namespace DungeonDweller.Screens
 {
@@ -21,6 +23,9 @@ namespace DungeonDweller.Screens
         private readonly bool _loadingIsSlow;
         private bool _otherScreensAreGone;
         private readonly GameScreen[] _screensToLoad;
+
+        private ContentManager _content;
+        private Texture2D _backgroundTexture;
 
         // Constructor is private: loading screens should be activated via the static Load method instead.
         private LoadingScreen(ScreenManager screenManager, bool loadingIsSlow, GameScreen[] screensToLoad)
@@ -43,6 +48,16 @@ namespace DungeonDweller.Screens
             var loadingScreen = new LoadingScreen(screenManager, loadingIsSlow, screensToLoad);
 
             screenManager.AddScreen(loadingScreen, controllingPlayer);
+        }
+
+        public override void Activate()
+        {
+
+            if (_content == null)
+                _content = new ContentManager(ScreenManager.Game.Services, "Content");
+
+            _backgroundTexture = _content.Load<Texture2D>("LoadingScreen");
+            base.Activate();
         }
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
@@ -70,6 +85,8 @@ namespace DungeonDweller.Screens
 
         public override void Draw(GameTime gameTime)
         {
+
+
             // If we are the only active screen, that means all the previous screens
             // must have finished transitioning off. We check for this in the Draw
             // method, rather than in Update, because it isn't enough just for the
@@ -99,9 +116,14 @@ namespace DungeonDweller.Screens
 
                 var color = Color.White * TransitionAlpha;
 
-                // Draw the text.
+                
+                var fullscreen = new Rectangle(0, 0, viewport.Width, viewport.Height);
+
                 spriteBatch.Begin();
-                spriteBatch.DrawString(font, message, textPosition, color);
+
+                spriteBatch.Draw(_backgroundTexture, fullscreen,
+                    color);
+
                 spriteBatch.End();
             }
         }

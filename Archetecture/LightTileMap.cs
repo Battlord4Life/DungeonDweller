@@ -54,9 +54,9 @@ namespace DungeonDweller.Archetecture
         {
             if (!FullAlpha)
             {
-                Alpha += .1f;
+                Alpha += .025f;
             }
-            if(Alpha == 1)
+            if(Alpha >= 1)
             {
                 FullAlpha = true;
             }

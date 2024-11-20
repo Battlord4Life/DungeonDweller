@@ -19,9 +19,9 @@ namespace DungeonDweller.Screens
 
         public MainMenuScreen() : base("Main Menu")
         {
-            var playGameMenuEntry = new MenuEntryImage("Play Game", "StartGear");
-            var NewGameMenuEntry = new MenuEntry("New Game");
-            var exitMenuEntry = new MenuEntryImage("Exit", "ExitGear");
+            var playGameMenuEntry = new MenuEntryImage("Play Game", "ContinueWheel");
+            var NewGameMenuEntry = new MenuEntryImage("New Game", "NewWheel");
+            var exitMenuEntry = new MenuEntryImage("Exit", "ExitWheel");
 
             playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
             NewGameMenuEntry.Selected += NewGameMenuEntrySelected;
@@ -106,14 +106,14 @@ namespace DungeonDweller.Screens
             if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
             declarecube = true;
 
-            cube.Draw();
+            //cube.Draw();
 
             for (int i = 0; i < MenuEntries.Count; i++)
             {
                 var menuEntry = MenuEntries[i];
                 if (menuEntry.Equals(_itemEntries[0])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4), ScreenManager.GraphicsDevice.Viewport.Width / 2);
-                if (menuEntry.Equals(_itemEntries[1])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4) * 2, ScreenManager.GraphicsDevice.Viewport.Width / 2);
-                if (menuEntry.Equals(_itemEntries[2])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4) * 3 , ScreenManager.GraphicsDevice.Viewport.Width / 2);
+                if (menuEntry.Equals(_itemEntries[2])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4) * 2, ScreenManager.GraphicsDevice.Viewport.Width / 2 + (128*3));
+                if (menuEntry.Equals(_itemEntries[1])) menuEntry.Position = new Vector2((ScreenManager.GraphicsDevice.Viewport.Width / 4) * 3 , ScreenManager.GraphicsDevice.Viewport.Width / 2);
 
 
                 bool isSelected = IsActive && i == SelectedEntry;
@@ -133,8 +133,8 @@ namespace DungeonDweller.Screens
 
             titlePosition.Y -= transitionOffset * 100;
 
-            spriteBatch.DrawString(font, MenuTitle, titlePosition, titleColor,
-                0, titleOrigin, titleScale*2, SpriteEffects.None, 0);
+            //spriteBatch.DrawString(font, MenuTitle, titlePosition, titleColor,
+            //    0, titleOrigin, titleScale*2, SpriteEffects.None, 0);
 
             spriteBatch.End();
         }

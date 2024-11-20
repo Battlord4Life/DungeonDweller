@@ -35,7 +35,7 @@ namespace DungeonDweller.Archetecture
 
         public Tilemap(string fileName)
         {
-            _filename = fileName;
+            _filename = fileName; 
         }
 
         public void LoadContent(ContentManager content)

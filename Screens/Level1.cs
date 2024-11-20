@@ -234,6 +234,10 @@ namespace DungeonDweller.Screens
                 new(64 * 15, 64 * 19)
             };
 
+
+            
+
+
             //adds random items to the level
             _GameplaySprites.Add(new CameraSprite((Vector2)RandomHelper.RandomFromList(CameraSpots)));
             _GameplaySprites.Add(new Torch((Vector2)RandomHelper.RandomFromList(Torch2Spots)));
@@ -251,6 +255,9 @@ namespace DungeonDweller.Screens
             foreach (ISprite s in _GameplaySprites) s.LoadContent(_content);
             foreach (ISprite s in _UISprites) s.LoadContent(_content);
             _darkTileset.LoadContent(_content);
+
+
+
 
             //updates the hero's stats
             _hero.UpdateTile(_backgroundSprite);
@@ -273,6 +280,65 @@ namespace DungeonDweller.Screens
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
             // it should not try to catch up.
+
+            if (RandomHelper.Next(2) == 0)
+            {
+                _backgroundSprite.SetCell(5, 7, 2);
+                _backgroundSprite.SetCell(13, 7, 4);
+            }
+            else
+            {
+                _backgroundSprite.SetCell(5, 7, 4);
+                _backgroundSprite.SetCell(13, 7, 2);
+            }
+            int Spike1 = RandomHelper.Next(5);
+            int Spike2 = RandomHelper.Next(5);
+            _backgroundSprite.SetCell(5, Spike1, 2);
+            _backgroundSprite.SetCell(13, Spike2, 2);
+
+            if (RandomHelper.Next(2) == 0)
+            {
+                _backgroundSprite.SetCell(2, 0, 2);
+                
+            }
+            else
+            {
+                _backgroundSprite.SetCell(0, 2, 2);
+            }
+
+            if (RandomHelper.Next(2) == 0)
+            {
+                _backgroundSprite.SetCell(17, 0, 2);
+
+            }
+            else
+            {
+                _backgroundSprite.SetCell(19, 2, 2);
+            }
+
+            if (RandomHelper.Next(2) == 0)
+            {
+                _backgroundSprite.SetCell(0, 17, 2);
+
+            }
+            else
+            {
+                _backgroundSprite.SetCell(2, 19, 2);
+            }
+
+            if (RandomHelper.Next(2) == 0)
+            {
+                _backgroundSprite.SetCell(17, 19, 2);
+
+            }
+            else
+            {
+                _backgroundSprite.SetCell(19, 17, 2);
+            }
+
+
+
+
             ScreenManager.Game.ResetElapsedTime();
         }
 
@@ -561,7 +627,7 @@ namespace DungeonDweller.Screens
             // If the game is transitioning on or off, fade it out to black.
             if (TransitionPosition > 0 || _pauseAlpha > 0)
             {
-                float alpha = MathHelper.Lerp(1f - TransitionAlpha, 1f, _pauseAlpha / 2);
+                float alpha = MathHelper.Lerp(1f - TransitionAlpha, 1f, _pauseAlpha);
 
                 ScreenManager.FadeBackBufferToBlack(alpha);
             }
