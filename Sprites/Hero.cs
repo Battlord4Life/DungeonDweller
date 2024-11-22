@@ -9,6 +9,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using DungeonDweller.Archetecture;
+using Microsoft.Xna.Framework.Audio;
 
 namespace DungeonDweller.Sprites
 {
@@ -113,6 +114,9 @@ namespace DungeonDweller.Sprites
 
         public bool Idle = true;
 
+        private SoundEffect _Refill;
+        private SoundEffect _Camera;
+        private SoundEffect _CameraBreak;
 
         public Hero(Vector2 Pos, InputManager input)
         {
@@ -168,6 +172,9 @@ namespace DungeonDweller.Sprites
         public void LoadContent(ContentManager content)
         {
             _texture = content.Load<Texture2D>("HeroSpriteSheet"); //update with HeroSpriteSheet
+            _Refill = content.Load<SoundEffect>("Refill");
+            _Camera = content.Load<SoundEffect>("CameraShutter");
+            _CameraBreak = content.Load<SoundEffect>("CameraBreak");
         }
 
         public void Update(GameTime gameTime)
@@ -264,6 +271,7 @@ namespace DungeonDweller.Sprites
 
             if (_inputMan.Refill)
             {
+                
                 switch (SelectedItem)
                 {
                     case 1:
@@ -273,6 +281,7 @@ namespace DungeonDweller.Sprites
                             Batteries--;
                             ToolActive = true;
                             UpdateSave = true;
+                            _Refill.Play();
                         }
 
                         break;
@@ -284,6 +293,8 @@ namespace DungeonDweller.Sprites
                             OilBottle--;
                             ToolActive = true;
                             UpdateSave = true;
+                            _Refill.Play();
+
 
                         }
                         break;
@@ -295,6 +306,8 @@ namespace DungeonDweller.Sprites
                             BulbBroken = false;
                             ToolActive = true;
                             UpdateSave = true;
+                            _Refill.Play();
+
 
                         }
                         break;
@@ -306,6 +319,7 @@ namespace DungeonDweller.Sprites
                             Batteries--;
                             ToolActive = true;
                             UpdateSave = true;
+                            _Refill.Play();
 
                         }
 
@@ -435,6 +449,11 @@ namespace DungeonDweller.Sprites
                         {
                             BulbBroken = true;
                             ToolActive = false;
+                            _CameraBreak.Play();
+                        }
+                        else
+                        {
+                            _Camera.Play();
                         }
                     }
                 }
