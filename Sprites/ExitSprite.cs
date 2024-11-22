@@ -17,12 +17,30 @@ namespace DungeonDweller.Sprites
         //The Torch texture 
         private Texture2D _texture;
 
+
+
         public bool Open = false;
 
         ///<summary>
         /// The Torches position in the world
         ///</summary>
         public Vector2 Position { get; set; }
+
+        public Vector2 TilePosition
+        {
+            get
+            {
+
+                return Position / 64;
+            }
+            set
+            {
+
+
+                Position = value * 64;
+
+            }
+        }
 
         public BoundingRectangle Bounds => new BoundingRectangle(new(Position.X + 8, Position.Y + 8), 32, 32);
 
@@ -67,7 +85,7 @@ namespace DungeonDweller.Sprites
 
         public ExitSprite(Vector2 Pos)
         {
-            Position = Pos;
+            Position = Pos *64;
         }
     }
 }

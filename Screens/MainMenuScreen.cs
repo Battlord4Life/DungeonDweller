@@ -50,6 +50,9 @@ namespace DungeonDweller.Screens
                 case 2:
                     Lev = new Level2();
                     break;
+                case 3:
+                    Lev = new Level3();
+                    break;
             }
             LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, Lev);
         }

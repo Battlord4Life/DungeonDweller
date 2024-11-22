@@ -3,6 +3,8 @@ using DungeonDweller.Archetecture;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct2D1.Effects;
+using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +13,11 @@ using System.Threading.Tasks;
 
 namespace DungeonDweller.Sprites
 {
-    public class Torch : ISprite
+    public class FlameKey : ISprite
     {
-        //The Torch texture 
-        private Texture2D _texture;
-
-        public bool Active = false;
-
-        ///<summary>
-        /// The Torches position in the world
-        ///</summary>
         public Vector2 Position { get; set; }
+
+        public Texture2D _texture;
 
         public Vector2 TilePosition
         {
@@ -39,50 +35,60 @@ namespace DungeonDweller.Sprites
             }
         }
 
+        // A timer variable for sprite animation
+        private double _animationTimer;
+
+        // The current animation frame 
+        private short _animationFrame;
+
         public BoundingRectangle Bounds => new BoundingRectangle(new(Position.X + 8, Position.Y + 8), 32, 32);
 
-        public string Name => "Torch";
+        public string Name => "FlameKey";
+
+        public bool Collected = false;
+
+        public bool Collides(ISprite other)
+        {
+            return Bounds.CollidesWith(other.Bounds) && !Collected;
+
+        }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(_texture, Position + new Vector2(16, 0), Color.White);
+
+            _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+
+
+            if (_animationTimer > (1 / 1.99))
+            {
+                _animationFrame++;
+                if (_animationFrame > 3) _animationFrame = 0;
+                _animationTimer -= (1 / 1.99);
+            }
+
+            // Determine the source rectangle 
+            var sourceRect = new Rectangle(_animationFrame * 64 * 1, 0, 64 * 1, 64 * 1);
+
+            spriteBatch.Draw(_texture, Collected ? new Vector2(-100, -100) : Position, sourceRect, Color.White);
         }
 
         public void LoadContent(ContentManager content)
         {
-            _texture = content.Load<Texture2D>("TorchSprite");
+            _texture = content.Load<Texture2D>("FlameKey");
         }
 
         public void Update(GameTime gameTime)
         {
-
-        }
-
-        public bool Collides(ISprite other)
-        {
-            bool temp = Bounds.CollidesWith(other.Bounds);
-
-            if (temp)
-            {
-                if (other.Name == "Hero")
-                {
-                    if (((Hero)other).ToolActive)
-                    {
-                        Active = true;
-                    }
-                    
-                }
-            }
-            return temp;
+            
         }
 
         public void UpdateLightMap(LightTileMap tm)
         {
-            int X = (int)(TilePosition.X);
-            int Y = (int)(TilePosition.Y);
-
-            if (Active)
+            if (!Collected)
             {
+                int X = (int)(TilePosition.X);
+                int Y = (int)(TilePosition.Y);
+
                 tm.SetLight(X, Y, 4);
                 bool TM = tm.SetLight(X, Y - 1, 4);
                 bool TR = tm.SetLight(X + 1, Y - 1, 4);
@@ -111,9 +117,9 @@ namespace DungeonDweller.Sprites
             }
         }
 
-        public Torch(Vector2 Pos)
+        public FlameKey(Vector2 pos)
         {
-            Position = Pos *64;
+            Position = pos * 64;
         }
     }
 }

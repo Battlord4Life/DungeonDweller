@@ -13,9 +13,11 @@ using System.Threading.Tasks;
 
 namespace DungeonDweller.Sprites
 {
-    public class FlashlightSprite : ISprite
+    public class MedicPickup : ISprite
     {
         public Vector2 Position { get; set; }
+
+        public Texture2D _texture;
 
         public Vector2 TilePosition
         {
@@ -33,33 +35,15 @@ namespace DungeonDweller.Sprites
             }
         }
 
-        public Texture2D _texture;
-
         public BoundingRectangle Bounds => new BoundingRectangle(new(Position.X + 8, Position.Y + 8), 32, 32);
 
-        public string Name => "FlashLightSprite";
+        public string Name => "MedicPickup";
 
         public bool Collected = false;
 
         public bool Collides(ISprite other)
         {
-            bool temp = Bounds.CollidesWith(other.Bounds);
-
-            if (temp)
-            {
-                if(other.Name == "Hero")
-                {
-                    if (((Hero)other).Items.Contains("Flashlight"))
-                    {
-                        ((Hero)other).Batteries += 2;
-                    }
-                    else
-                    {
-                        ((Hero)other).Items.Add("Flashlight");
-                    }
-                }
-            }
-            return temp && !Collected;
+            return Bounds.CollidesWith(other.Bounds) && !Collected;
 
         }
 
@@ -70,7 +54,7 @@ namespace DungeonDweller.Sprites
 
         public void LoadContent(ContentManager content)
         {
-            _texture = content.Load<Texture2D>("FlashLight64");
+            _texture = content.Load<Texture2D>("HealthPack");
         }
 
         public void Update(GameTime gameTime)
@@ -83,7 +67,7 @@ namespace DungeonDweller.Sprites
             
         }
 
-        public FlashlightSprite(Vector2 pos)
+        public MedicPickup(Vector2 pos)
         {
             Position = pos * 64;
         }

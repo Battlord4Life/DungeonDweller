@@ -19,6 +19,22 @@ namespace DungeonDweller.Sprites
 
         public Texture2D _texture;
 
+        public Vector2 TilePosition
+        {
+            get
+            {
+
+                return Position / 64;
+            }
+            set
+            {
+
+
+                Position = value * 64;
+
+            }
+        }
+
         public bool Collected = false;
 
         public BoundingRectangle Bounds => new BoundingRectangle(new(Position.X + 8, Position.Y + 8), 32, 32);
@@ -69,7 +85,7 @@ namespace DungeonDweller.Sprites
 
         public CameraSprite(Vector2 pos)
         {
-            Position = pos;
+            Position = pos * 64;
         }
     }
 }

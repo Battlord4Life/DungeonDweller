@@ -25,6 +25,22 @@ namespace DungeonDweller.Sprites
 
         public bool Collected = false;
 
+        public Vector2 TilePosition
+        {
+            get
+            {
+
+                return Position / 64;
+            }
+            set
+            {
+
+
+                Position = value * 64;
+
+            }
+        }
+
         public bool Collides(ISprite other)
         {
             return Bounds.CollidesWith(other.Bounds) && !Collected;
@@ -53,7 +69,7 @@ namespace DungeonDweller.Sprites
 
         public LanternSprite(Vector2 pos)
         {
-            Position = pos;
+            Position = pos * 64;
         }
     }
 }

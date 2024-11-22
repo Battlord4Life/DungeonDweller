@@ -204,9 +204,9 @@ namespace DungeonDweller.Screens
             _UINightVision = _content.Load<Texture2D>("UINightVision");
 
             //Creates a new hero and exit then adds them to the gameplay sprites
-            _hero = new Hero(new Vector2((1280 / 20) * 0, (1280 / 20) * 0), _inputManager);
+            _hero = new Hero(new Vector2( 0,  0), _inputManager);
 
-            _exit = new ExitSprite(new(64 * 0, 64 * 19));
+            _exit = new ExitSprite(new( 0, 19));
 
             _GameplaySprites.Add(_exit);
             _GameplaySprites.Add(_hero);
@@ -216,12 +216,12 @@ namespace DungeonDweller.Screens
 
 
             
-            _GameplaySprites.Add(new Torch(new Vector2((1280 / 20) * 19, (1280 / 20) * 0)));
-            _GameplaySprites.Add(new Torch(new Vector2((1280 / 20) * 19, (1280 / 20) * 19)));
+            _GameplaySprites.Add(new Torch(new Vector2(19, 0)));
+            _GameplaySprites.Add(new Torch(new Vector2( 19, 19)));
 
 
-            int Torch3X = RandomHelper.Next(0, 6) * 64;
-            int Torch3Y = (RandomHelper.Next(3) + 5 + (Torch3X/64)) * 64;
+            int Torch3X = RandomHelper.Next(0, 6);
+            int Torch3Y = (RandomHelper.Next(3) + 5 + (Torch3X));
 
             _GameplaySprites.Add(new Torch(new Vector2(Torch3X, Torch3Y)));
 
@@ -240,14 +240,14 @@ namespace DungeonDweller.Screens
 
                     break;
                 case 1 or 4 or 7:
-                    _GameplaySprites.Add(new FlashlightSprite(new Vector2(ItemX1 * 64, ItemY1 * 64)));
+                    _GameplaySprites.Add(new FlashlightSprite(new Vector2(ItemX1, ItemY1 )));
                     break;
                 case 2 or 5 or 8:
-                    _GameplaySprites.Add(new LanternSprite(new Vector2(ItemX1 * 64, ItemY1 * 64)));
+                    _GameplaySprites.Add(new LanternSprite(new Vector2(ItemX1  , ItemY1  )));
 
                     break;
                 case 3:
-                    _GameplaySprites.Add(new CameraSprite(new Vector2(ItemX1 * 64, ItemY1 * 64)));
+                    _GameplaySprites.Add(new CameraSprite(new Vector2(ItemX1  , ItemY1  )));
 
                     break;
             }
@@ -258,14 +258,14 @@ namespace DungeonDweller.Screens
 
                     break;
                 case 1 or 4 or 7:
-                    _GameplaySprites.Add(new FlashlightSprite(new Vector2(ItemX2 * 64, ItemY2 * 64)));
+                    _GameplaySprites.Add(new FlashlightSprite(new Vector2(ItemX2  , ItemY2  )));
                     break;
                 case 2 or 5 or 8:
-                    _GameplaySprites.Add(new LanternSprite(new Vector2(ItemX2 * 64, ItemY2 * 64)));
+                    _GameplaySprites.Add(new LanternSprite(new Vector2(ItemX2  , ItemY2  )));
 
                     break;
                 case 3:
-                    _GameplaySprites.Add(new CameraSprite(new Vector2(ItemX2 * 64, ItemY2 * 64)));
+                    _GameplaySprites.Add(new CameraSprite(new Vector2(ItemX2  , ItemY2  )));
 
                     break;
             }
@@ -274,7 +274,7 @@ namespace DungeonDweller.Screens
             int CameraX = RandomHelper.Next(0, 5);
             int CameraY = RandomHelper.Next(9 + CameraX, 14);
 
-            _GameplaySprites.Add(new CameraSprite(new Vector2(CameraX * 64, CameraY * 64)));
+            _GameplaySprites.Add(new CameraSprite(new Vector2(CameraX  , CameraY  )));
 
 
 
@@ -1017,9 +1017,9 @@ namespace DungeonDweller.Screens
         private void OnLevelEnd()
         {
             ScreenManager.Game.Components.Remove(rain);
-            ScreenManager.GameSaveState.Level = 2;
+            ScreenManager.GameSaveState.Level = 3;
             ScreenManager.Save(ScreenManager.GameSaveState);
-            ScreenManager.AddScreen(new Level2(), ControllingPlayer);
+            ScreenManager.AddScreen(new Level3(), ControllingPlayer);
             ExitScreen();
         }
     }

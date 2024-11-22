@@ -55,6 +55,22 @@ namespace DungeonDweller.Sprites
         ///</summary>
         public Vector2 Position { get;  set; }
 
+        public Vector2 TilePosition
+        {
+            get
+            {
+
+                return Position / 64;
+            }
+            set
+            {
+
+
+                Position = value * 64;
+
+            }
+        }
+
         public BoundingRectangle Bounds => new BoundingRectangle(new(Position.X + 8, Position.Y + 8), _scale * 8, _scale * 8);
 
         public string Name => "Hero";
@@ -100,11 +116,11 @@ namespace DungeonDweller.Sprites
 
         public Hero(Vector2 Pos, InputManager input)
         {
-            Position = Pos;
+            Position = Pos * 64;
             _inputMan = input;
             _speed = 100;
             _scale = 4;
-            _heroVel = new Vector2(0, 1) * _speed;
+
             Items.Add("None");
             //Items.Add("Flash");
             
@@ -162,29 +178,29 @@ namespace DungeonDweller.Sprites
 
             HeroDirection = _inputMan.EnumDirection;
 
-            Vector2 XY = Position / _map._tileHeight;
+            Vector2 XY = TilePosition;
 
             if (_inputMan.MoveUp)
             {
                 
-                if(!_map.IsWall((int)XY.X, (int)XY.Y - 1)) Position = new(Position.X , Position.Y - 64f);
+                if(!_map.IsWall((int)XY.X, (int)XY.Y - 1)) TilePosition = new(TilePosition.X , TilePosition.Y - 1);
                 Idle = false;
             }
             if (_inputMan.MoveLeft)
             {
-                if (!_map.IsWall((int)XY.X-1, (int)XY.Y)) Position = new(Position.X - 64f, Position.Y);
+                if (!_map.IsWall((int)XY.X-1, (int)XY.Y)) TilePosition = new(TilePosition.X - 1, TilePosition.Y);
                 Idle = false;
 
             }
             if (_inputMan.MoveRight)
             {
-                if (!_map.IsWall((int)XY.X +1, (int)XY.Y)) Position = new(Position.X + 64f, Position.Y);
+                if (!_map.IsWall((int)XY.X +1, (int)XY.Y)) TilePosition = new(TilePosition.X + 1, TilePosition.Y);
                 Idle = false;
 
             }
             if (_inputMan.MoveDown)
             {
-                if (!_map.IsWall((int)XY.X, (int)XY.Y + 1)) Position = new(Position.X, Position.Y + 64f);
+                if (!_map.IsWall((int)XY.X, (int)XY.Y + 1)) TilePosition = new(TilePosition.X, TilePosition.Y + 1);
                 Idle = false;
 
             }
@@ -309,8 +325,8 @@ namespace DungeonDweller.Sprites
 
         public void UpdateLightMap(LightTileMap tm)
         {
-            int X = (int)(Position.X / 64);
-            int Y = (int)(Position.Y / 64);
+            int X = (int)(TilePosition.X);
+            int Y = (int)(TilePosition.Y);
 
             if (ToolActive)
             {
