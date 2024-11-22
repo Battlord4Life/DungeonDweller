@@ -50,6 +50,18 @@
 /processorParam:TextureFormat=Color
 /build:Camera64.png
 
+#begin CameraBreak.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:CameraBreak.wav
+
+#begin CameraShutter.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:CameraShutter.wav
+
 #begin ContinueWheel.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -85,6 +97,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:DarknessOverlayTileMap64.png
+
+#begin DoorOpen.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:DoorOpen.wav
 
 #begin drop.png
 /importer:TextureImporter
@@ -193,6 +211,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:FlashLight64.png
+
+#begin GearHurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:GearHurt.wav
+
+#begin GearshiftWIP.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:GearshiftWIP.mp3
 
 #begin GearshiftWIP.mp3
 /importer:Mp3Importer
@@ -380,6 +410,12 @@
 /processorParam:TextureFormat=Color
 /build:NonFlameFinalGear.png
 
+#begin Objective.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Objective.wav
+
 #begin particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -392,6 +428,12 @@
 /processorParam:TextureFormat=Color
 /build:particle.png
 
+#begin Pickup.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Pickup.wav
+
 #begin PixelFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -399,11 +441,29 @@
 /processorParam:TextureFormat=Compressed
 /build:PixelFont.spritefont
 
+#begin Refill.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Refill.wav
+
 #begin Snap.mp3
 /importer:Mp3Importer
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Snap.mp3
+
+#begin Snap.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Snap.mp3
+
+#begin SpikeHurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SpikeHurt.wav
 
 #begin StartGear.png
 /importer:TextureImporter
@@ -560,4 +620,10 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:UIPatch.png
+
+#begin VentHurt.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:VentHurt.wav
 

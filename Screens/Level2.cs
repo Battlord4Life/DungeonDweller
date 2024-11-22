@@ -146,6 +146,13 @@ namespace DungeonDweller.Screens
         /// </summary>
         private SoundEffect _Hurt;
 
+        private SoundEffect _VentHurt;
+        private SoundEffect _SpikeHurt;
+        private SoundEffect _GearHurt;
+        private SoundEffect _Objective;
+        private SoundEffect _Pickup;
+        private SoundEffect _DoorOpen;
+
         /// <summary>
         /// Level Gimmick to count lanterns lit
         /// </summary>
@@ -309,7 +316,14 @@ namespace DungeonDweller.Screens
 
             //Gets the font and sound
             _gameFont = _content.Load<SpriteFont>("PixelFont");
-            _Hurt = _content.Load<SoundEffect>("Snap");
+            //_Hurt = _content.Load<SoundEffect>("Snap");
+
+            _VentHurt = _content.Load<SoundEffect>("VentHurt");
+            _SpikeHurt = _content.Load<SoundEffect>("SpikeHurt");
+            _GearHurt = _content.Load<SoundEffect>("GearHurt");
+            _Objective = _content.Load<SoundEffect>("Objective");
+            _Pickup = _content.Load<SoundEffect>("Pickup");
+            _DoorOpen = _content.Load<SoundEffect>("DoorOpen");
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
@@ -592,7 +606,7 @@ namespace DungeonDweller.Screens
                             if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState.CurrHealth = ScreenManager.GameSaveState.MaxHealth;
 
                             HeroHealth--;
-                            _Hurt.Play();
+                            _SpikeHurt.Play();
                             _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
                         }
                     }
@@ -601,6 +615,7 @@ namespace DungeonDweller.Screens
                 if (LanterLeft == 0 && !_exit.Open)
                 {
                     _exit.Open = true;
+                    _DoorOpen.Play();
                 }
 
                 if (HeroHealth <= 0) _inputManager.Active = false;
@@ -833,7 +848,23 @@ namespace DungeonDweller.Screens
                                     ScreenManager.GameSaveState.CurrHealth--;
                                     if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState = ScreenManager.Load();
                                     HeroHealth--;
-                                    _Hurt.Play();
+                                    _GearHurt.Play();
+                                    _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
+                                }
+                            }
+
+                        }
+                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "Gear" || Collection[j].Name == "Gear")))
+                        {
+
+                            if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
+                            {
+                                if (_inputManager.Active)
+                                {
+                                    ScreenManager.GameSaveState.CurrHealth--;
+                                    if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState = ScreenManager.Load();
+                                    HeroHealth--;
+                                    _GearHurt.Play();
                                     _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
                                 }
                             }
@@ -865,6 +896,7 @@ namespace DungeonDweller.Screens
                                 {
                                     _hero.Items.Add("Flashlight");
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "FlashLightSprite")
                                 {
                                     ((FlashlightSprite)Collection[i]).Collected = true;
@@ -902,6 +934,7 @@ namespace DungeonDweller.Screens
                                     _hero.Items.Add("Lantern");
 
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "LanternSprite")
                                 {
                                     ((LanternSprite)Collection[i]).Collected = true;
@@ -910,6 +943,67 @@ namespace DungeonDweller.Screens
                                 {
                                     ((LanternSprite)Collection[j]).Collected = true;
                                 }
+                            }
+                        }
+                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "MedicPickup" || Collection[j].Name == "MedicPickup")))
+                        {
+                            bool col = true;
+                            if (Collection[i].Name == "MedicPickup")
+                            {
+                                col = ((MedicPickup)Collection[i]).Collected;
+
+
+                            }
+                            else
+                            {
+                                col = ((MedicPickup)Collection[j]).Collected;
+
+                            }
+                            if (!col)
+                            {
+                                ScreenManager.GameSaveState.CurrHealth++;
+                                HeroHealth++;
+                                if (HeroHealth > MaxHeroHealth) HeroHealth = MaxHeroHealth;
+                                _Pickup.Play();
+                                if (Collection[i].Name == "MedicPickup")
+                                {
+                                    ((MedicPickup)Collection[i]).Collected = true;
+                                }
+                                else
+                                {
+                                    ((MedicPickup)Collection[j]).Collected = true;
+                                }
+                            }
+                        }
+
+                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "FlameKey" || Collection[j].Name == "FlameKey")))
+                        {
+                            bool col = true;
+                            if (Collection[i].Name == "FlameKey")
+                            {
+                                col = ((FlameKey)Collection[i]).Collected;
+
+
+                            }
+                            else
+                            {
+                                col = ((FlameKey)Collection[j]).Collected;
+
+                            }
+                            if (!col)
+                            {
+
+
+                                if (Collection[i].Name == "FlameKey")
+                                {
+                                    ((FlameKey)Collection[i]).Collected = true;
+                                }
+                                else
+                                {
+                                    ((FlameKey)Collection[j]).Collected = true;
+                                }
+                                _Objective.Play();
+                                //KeyLeft--;
                             }
                         }
                         if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "CameraSprite" || Collection[j].Name == "CameraSprite")))
@@ -938,6 +1032,7 @@ namespace DungeonDweller.Screens
                                 {
                                     _hero.Items.Add("Camera");
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "CameraSprite")
                                 {
                                     ((CameraSprite)Collection[i]).Collected = true;
@@ -975,6 +1070,7 @@ namespace DungeonDweller.Screens
                                 {
                                     _hero.Items.Add("Night Vision");
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "NightVisionSprite")
                                 {
                                     ((NightVisionSprite)Collection[i]).Collected = true;
@@ -992,13 +1088,22 @@ namespace DungeonDweller.Screens
                                 if (Collection[i].Name == "Torch")
                                 {
 
-                                    if (!((Torch)Collection[i]).Active) LanterLeft--;
-                                    ((Torch)Collection[i]).Active = true;
+                                    if (!((Torch)Collection[i]).Active)
+                                    {
+                                        LanterLeft--;
+                                        ((Torch)Collection[i]).Active = true;
+                                        _Objective.Play();
+                                    }
                                 }
                                 else
                                 {
-                                    if (!((Torch)Collection[j]).Active) LanterLeft--;
-                                    ((Torch)Collection[j]).Active = true;
+                                    if (!((Torch)Collection[j]).Active)
+                                    {
+                                        LanterLeft--;
+                                        ((Torch)Collection[j]).Active = true;
+                                        _Objective.Play();
+
+                                    }
                                 }
                             }
                         }
@@ -1006,7 +1111,11 @@ namespace DungeonDweller.Screens
                         {
                             if (_exit.Open)
                             {
-                                OnLevelEnd();
+                                
+                                    OnLevelEnd();
+                                
+                                
+
                             }
                         }
                     }

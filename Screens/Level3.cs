@@ -1,17 +1,12 @@
-﻿using System;
-using System.Threading;
+﻿using DungeonDweller.Archetecture;
+using DungeonDweller.Sprites;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using DungeonDweller.Archetecture;
+using System;
 using System.Collections.Generic;
-using DungeonDweller.Sprites;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
-using System.Reflection.Metadata;
-using SharpDX.Direct2D1;
-using Microsoft.Xna.Framework.Audio;
-using SharpDX.MediaFoundation;
 using System.Text;
 
 
@@ -147,6 +142,15 @@ namespace DungeonDweller.Screens
         /// </summary>
         private SoundEffect _Hurt;
 
+        private SoundEffect _VentHurt;
+        private SoundEffect _SpikeHurt;
+        private SoundEffect _GearHurt;
+        private SoundEffect _Objective;
+        private SoundEffect _Pickup;
+        private SoundEffect _DoorOpen;
+
+
+
         /// <summary>
         /// Level Gimmick to count lanterns lit
         /// </summary>
@@ -207,7 +211,7 @@ namespace DungeonDweller.Screens
             _UINightVision = _content.Load<Texture2D>("UINightVision");
 
             //Creates a new hero and exit then adds them to the gameplay sprites
-            _hero = new Hero(new Vector2( 10,  19), _inputManager);
+            _hero = new Hero(new Vector2(10, 19), _inputManager);
 
             _exit = new ExitSprite(new(19, 0));
             _exit2 = new ExitSprite(new(0, 0));
@@ -225,10 +229,10 @@ namespace DungeonDweller.Screens
             _GameplaySprites.Add(new LightGearEnemy(new Vector2(9, 16), 9, true, 100));
             _GameplaySprites.Add(new LightGearEnemy(new Vector2(9, 10), 9, true, 200));
 
-            _GameplaySprites.Add(new MedicPickup(new (12, 19)));
-            _GameplaySprites.Add(new MedicPickup(new (7, 19)));
-            _GameplaySprites.Add(new FlameKey(new (5, 2)));
-            _GameplaySprites.Add(new FlameKey(new (14, 3)));
+            _GameplaySprites.Add(new MedicPickup(new(12, 19)));
+            _GameplaySprites.Add(new MedicPickup(new(7, 19)));
+            _GameplaySprites.Add(new FlameKey(new(5, 2)));
+            _GameplaySprites.Add(new FlameKey(new(14, 3)));
 
 
             //adds the particle system
@@ -246,7 +250,7 @@ namespace DungeonDweller.Screens
 
 
 
-            
+
 
 
 
@@ -266,7 +270,15 @@ namespace DungeonDweller.Screens
 
             //Gets the font and sound
             _gameFont = _content.Load<SpriteFont>("PixelFont");
-            _Hurt = _content.Load<SoundEffect>("Snap");
+            //_Hurt = _content.Load<SoundEffect>("Snap");
+
+
+            _VentHurt = _content.Load<SoundEffect>("VentHurt");
+            _SpikeHurt = _content.Load<SoundEffect>("SpikeHurt");
+            _GearHurt = _content.Load<SoundEffect>("GearHurt");
+            _Objective = _content.Load<SoundEffect>("Objective");
+            _Pickup = _content.Load<SoundEffect>("Pickup");
+            _DoorOpen = _content.Load<SoundEffect>("DoorOpen");
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
@@ -274,9 +286,9 @@ namespace DungeonDweller.Screens
 
             int spikesLeft = 10;
 
-            for(int i = 0; i< 20; i++)
+            for (int i = 0; i < 20; i++)
             {
-                if(RandomHelper.Next(0,2) == 1 && spikesLeft > 0)
+                if (RandomHelper.Next(0, 2) == 1 && spikesLeft > 0)
                 {
                     spikesLeft--;
                     _backgroundSprite.SetCell(i, 12, 3);
@@ -424,8 +436,12 @@ namespace DungeonDweller.Screens
                             ScreenManager.GameSaveState.CurrHealth--;
                             if (ScreenManager.GameSaveState.CurrHealth <= 0) ScreenManager.GameSaveState.CurrHealth = ScreenManager.GameSaveState.MaxHealth;
 
+
                             HeroHealth--;
-                            _Hurt.Play();
+
+                            if (_backgroundSprite._map[(int)_hero.TilePosition.X, (int)_hero.TilePosition.Y] == 3) _SpikeHurt.Play();
+                            else _VentHurt.Play();
+
                             _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
                         }
                     }
@@ -435,6 +451,7 @@ namespace DungeonDweller.Screens
                 {
                     _exit.Open = true;
                     _exit2.Open = true;
+                    _DoorOpen.Play();
                 }
 
                 if (HeroHealth <= 0) _inputManager.Active = false;
@@ -667,7 +684,7 @@ namespace DungeonDweller.Screens
                                     ScreenManager.GameSaveState.CurrHealth--;
                                     if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState = ScreenManager.Load();
                                     HeroHealth--;
-                                    _Hurt.Play();
+                                    _GearHurt.Play();
                                     _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
                                 }
                             }
@@ -683,7 +700,7 @@ namespace DungeonDweller.Screens
                                     ScreenManager.GameSaveState.CurrHealth--;
                                     if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState = ScreenManager.Load();
                                     HeroHealth--;
-                                    _Hurt.Play();
+                                    _GearHurt.Play();
                                     _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
                                 }
                             }
@@ -715,6 +732,7 @@ namespace DungeonDweller.Screens
                                 {
                                     _hero.Items.Add("Flashlight");
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "FlashLightSprite")
                                 {
                                     ((FlashlightSprite)Collection[i]).Collected = true;
@@ -752,6 +770,7 @@ namespace DungeonDweller.Screens
                                     _hero.Items.Add("Lantern");
 
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "LanternSprite")
                                 {
                                     ((LanternSprite)Collection[i]).Collected = true;
@@ -781,7 +800,7 @@ namespace DungeonDweller.Screens
                                 ScreenManager.GameSaveState.CurrHealth++;
                                 HeroHealth++;
                                 if (HeroHealth > MaxHeroHealth) HeroHealth = MaxHeroHealth;
-                                
+                                _Pickup.Play();
                                 if (Collection[i].Name == "MedicPickup")
                                 {
                                     ((MedicPickup)Collection[i]).Collected = true;
@@ -809,7 +828,7 @@ namespace DungeonDweller.Screens
                             }
                             if (!col)
                             {
-                                
+
 
                                 if (Collection[i].Name == "FlameKey")
                                 {
@@ -819,6 +838,7 @@ namespace DungeonDweller.Screens
                                 {
                                     ((FlameKey)Collection[j]).Collected = true;
                                 }
+                                _Objective.Play();
                                 KeyLeft--;
                             }
                         }
@@ -848,6 +868,7 @@ namespace DungeonDweller.Screens
                                 {
                                     _hero.Items.Add("Camera");
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "CameraSprite")
                                 {
                                     ((CameraSprite)Collection[i]).Collected = true;
@@ -885,6 +906,7 @@ namespace DungeonDweller.Screens
                                 {
                                     _hero.Items.Add("Night Vision");
                                 }
+                                _Pickup.Play();
                                 if (Collection[i].Name == "NightVisionSprite")
                                 {
                                     ((NightVisionSprite)Collection[i]).Collected = true;
@@ -902,13 +924,22 @@ namespace DungeonDweller.Screens
                                 if (Collection[i].Name == "Torch")
                                 {
 
-                                    if (!((Torch)Collection[i]).Active) LanterLeft--;
-                                    ((Torch)Collection[i]).Active = true;
+                                    if (!((Torch)Collection[i]).Active)
+                                    {
+                                        LanterLeft--;
+                                        ((Torch)Collection[i]).Active = true;
+                                        _Objective.Play();
+                                    }
                                 }
                                 else
                                 {
-                                    if (!((Torch)Collection[j]).Active) LanterLeft--;
-                                    ((Torch)Collection[j]).Active = true;
+                                    if (!((Torch)Collection[j]).Active)
+                                    {
+                                        LanterLeft--;
+                                        ((Torch)Collection[j]).Active = true;
+                                        _Objective.Play();
+
+                                    }
                                 }
                             }
                         }
@@ -916,7 +947,7 @@ namespace DungeonDweller.Screens
                         {
                             if (_exit.Open)
                             {
-                                if(_hero.TilePosition == _exit.TilePosition)
+                                if (_hero.TilePosition == _exit.TilePosition)
                                 {
                                     OnLevelEnd();
                                 }
@@ -924,7 +955,7 @@ namespace DungeonDweller.Screens
                                 {
                                     OnLevelEnd2();
                                 }
-                                
+
                             }
                         }
                     }
