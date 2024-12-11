@@ -332,14 +332,23 @@ namespace DungeonDweller.Screens
                 int X = RandomHelper.Next(1,19);
                 int Y = RandomHelper.Next(1,19);
 
-                
+                bool overlap = true;
+
+                foreach (ISprite sprite in _GameplaySprites)
+                {
+                    if ((sprite.Position / 64).Equals(new Vector2(X, Y))) overlap = false;
+                }
+
+                if (overlap)
+                {
 
                     if (_backgroundSprite.GetCell(X, Y) == 1 || _backgroundSprite.GetCell(X, Y) == 2)
                     {
                         _backgroundSprite.SetCell(X, Y, _backgroundSprite.GetCell(X, Y) + 4);
                         spikesLeft--;
                     }
-                
+                }
+
             }
 
             // once the load has finished, we use ResetElapsedTime to tell the game's

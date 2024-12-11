@@ -407,7 +407,14 @@ namespace DungeonDweller.Screens
                 int X = RandomHelper.Next(20);
                 int Y = RandomHelper.Next(20);
 
-                if (!(X == 19 && Y == 19) && !(X == 0 && Y == 0))
+                bool overlap = true;
+
+                foreach(ISprite sprite in _GameplaySprites)
+                {
+                    if ((sprite.Position / 64).Equals(new Vector2(X, Y))) overlap = false;
+                }
+
+                if (overlap)
                 {
 
                     if (_backgroundSprite.GetCell(X, Y) == 1 || _backgroundSprite.GetCell(X, Y) == 2)
