@@ -19,6 +19,7 @@ namespace DungeonDweller.Screens
         Song MainMenu;
 
         bool declarecube = false;
+        private ContentManager _content;
 
         public MainMenuScreen() : base("Main Menu")
         {
@@ -81,11 +82,24 @@ namespace DungeonDweller.Screens
             ScreenManager.AddScreen(confirmExitMessageBox, e.PlayerIndex);
         }
 
+        public override void Activate()
+        {
+            base.Activate();
+
+            if (_content == null)
+                _content = new ContentManager(ScreenManager.Game.Services, "Content");
+
+            MainMenu = _content.Load<Song>("CaveEntranceFin");
+            MediaPlayer.Play(MainMenu);
+            MediaPlayer.IsRepeating = true;
+        }
+
 
         private void NewGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
             this.ScreenManager.GameSaveState = new GameSaveState();
             ScreenManager.Save(new GameSaveState());
+            
             LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new Level1());
         }
 
@@ -108,7 +122,7 @@ namespace DungeonDweller.Screens
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
-            //if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
+            
             //declarecube = true;
 
             //cube.Update(gameTime);

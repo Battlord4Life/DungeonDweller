@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
@@ -175,6 +176,7 @@ namespace DungeonDweller.Screens
         public bool Refill = false;
         private bool SFX;
         private Vector2 PrevHeroPosition;
+        private Song _Song;
 
         public Level6()
         {
@@ -318,6 +320,10 @@ namespace DungeonDweller.Screens
             _ObjectiveWarn = _content.Load<SoundEffect>("ObjectiveWarn");
             _PickupWarn = _content.Load<SoundEffect>("PickupWarn");
             _GlassWarn = _content.Load<SoundEffect>("VentWarn");
+            _Song = _content.Load<Song>("RoarOfVictoryFin");
+
+            MediaPlayer.Play(_Song);
+            MediaPlayer.IsRepeating = true;
 
             int spikesLeft = 25;
 

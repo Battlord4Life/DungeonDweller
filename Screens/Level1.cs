@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -155,6 +156,7 @@ namespace DungeonDweller.Screens
         private SoundEffect _SpikeWarn;
         private SoundEffect _GearWarn;
         private SoundEffect _PickupWarn;
+        private Song _Song;
         private SoundEffect _ObjectiveWarn;
 
         /// <summary>
@@ -304,6 +306,10 @@ namespace DungeonDweller.Screens
             _GearWarn = _content.Load<SoundEffect>("GearWarn");
             _ObjectiveWarn = _content.Load<SoundEffect>("ObjectiveWarn");
             _PickupWarn = _content.Load<SoundEffect>("PickupWarn");
+            _Song = _content.Load<Song>("AdventureBeginsFin");
+
+            MediaPlayer.Play(_Song);
+            MediaPlayer.IsRepeating = true;
 
 
 

@@ -14,6 +14,12 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin AdventureBeginsFin.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:AdventureBeginsFin.mp3
+
 #begin Background.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -26,6 +32,12 @@
 /processorParam:TextureFormat=Color
 /build:Background.png
 
+#begin BattleWornFin.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:BattleWornFin.mp3
+
 #begin blank.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -37,6 +49,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:blank.png
+
+#begin BloodyDarknessFin.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:BloodyDarknessFin.mp3
+
+#begin BloodyLightsFin.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:BloodyLightsFin.mp3
 
 #begin Camera64.png
 /importer:TextureImporter
@@ -67,6 +91,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:CamSelect.wav
+
+#begin CaveEntranceFin.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:CaveEntranceFin.mp3
 
 #begin ClosedFireOrb.png
 /importer:TextureImporter
@@ -530,6 +560,12 @@
 /processorParam:Quality=Best
 /build:ObjectiveWarn.wav
 
+#begin OldWalkwaysFin.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:OldWalkwaysFin.mp3
+
 #begin particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -566,6 +602,12 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:Refill.wav
+
+#begin RoarOfVictoryFin.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:RoarOfVictoryFin.mp3
 
 #begin Snap.mp3
 /importer:Mp3Importer

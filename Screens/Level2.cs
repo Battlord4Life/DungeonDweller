@@ -13,6 +13,7 @@ using SharpDX.Direct2D1;
 using Microsoft.Xna.Framework.Audio;
 using SharpDX.MediaFoundation;
 using System.Text;
+using Microsoft.Xna.Framework.Media;
 
 
 
@@ -161,6 +162,7 @@ namespace DungeonDweller.Screens
         private SoundEffect _SpikeWarn;
         private SoundEffect _GearWarn;
         private SoundEffect _PickupWarn;
+        private Song _Song;
         private SoundEffect _ObjectiveWarn;
 
         /// <summary>
@@ -339,6 +341,10 @@ namespace DungeonDweller.Screens
             _GearWarn = _content.Load<SoundEffect>("GearWarn");
             _ObjectiveWarn = _content.Load<SoundEffect>("ObjectiveWarn");
             _PickupWarn = _content.Load<SoundEffect>("PickupWarn");
+            _Song = _content.Load<Song>("OldWalkwaysFin");
+
+            MediaPlayer.Play(_Song);
+            MediaPlayer.IsRepeating = true;
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that

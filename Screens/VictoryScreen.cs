@@ -15,14 +15,17 @@ namespace DungeonDweller.Screens
 
             var resumeGameMenuEntry = new MenuEntry("Resume Game");
             var Restart = new MenuEntry("Restart Level");
+            var HTP = new MenuEntry("How to Play");
             var quitGameMenuEntry = new MenuEntry("Quit Game");
 
             resumeGameMenuEntry.Selected += OnCancel;
             Restart.Selected += RestartLevel;
+            HTP.Selected += HowToPlay;
             quitGameMenuEntry.Selected += QuitGameMenuEntrySelected;
 
             MenuEntries.Add(resumeGameMenuEntry);
             MenuEntries.Add(Restart);
+            MenuEntries.Add(HTP);
             MenuEntries.Add(quitGameMenuEntry);
         }
 
@@ -34,6 +37,16 @@ namespace DungeonDweller.Screens
             var confirmQuitMessageBox = new MessageBoxScreen(message);
 
             confirmQuitMessageBox.Accepted += ConfirmQuitMessageBoxAccepted;
+
+            ScreenManager.AddScreen(confirmQuitMessageBox, ControllingPlayer);
+        }
+
+        private void HowToPlay(object sender, PlayerIndexEventArgs e)
+        {
+            const string message = "WASD to Move, R to Refill";
+            var confirmQuitMessageBox = new MessageBoxScreen(message);
+
+            confirmQuitMessageBox.Accepted += OnCancel;
 
             ScreenManager.AddScreen(confirmQuitMessageBox, ControllingPlayer);
         }
