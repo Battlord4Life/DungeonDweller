@@ -62,6 +62,24 @@
 /processorParam:Quality=Best
 /build:CameraShutter.wav
 
+#begin CamSelect.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:CamSelect.wav
+
+#begin ClosedFireOrb.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ClosedFireOrb.png
+
 #begin ContinueWheel.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -97,6 +115,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:DarknessOverlayTileMap64.png
+
+#begin DarkStalker.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:DarkStalker.png
 
 #begin DoorOpen.wav
 /importer:WavImporter
@@ -200,6 +230,12 @@
 /processorParam:TextureFormat=Color
 /build:FlameKey.png
 
+#begin FlashEmpty.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:FlashEmpty.wav
+
 #begin FlashLight64.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -212,17 +248,17 @@
 /processorParam:TextureFormat=Color
 /build:FlashLight64.png
 
+#begin FlashSelect.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:FlashSelect.wav
+
 #begin GearHurt.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:GearHurt.wav
-
-#begin GearshiftWIP.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:GearshiftWIP.mp3
 
 #begin GearshiftWIP.mp3
 /importer:Mp3Importer
@@ -241,6 +277,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:GearTrack.png
+
+#begin GearWarn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:GearWarn.wav
 
 #begin gradient.png
 /importer:TextureImporter
@@ -338,6 +380,18 @@
 /processorParam:TextureFormat=Color
 /build:Lantern64.png
 
+#begin LanternEmpty.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:LanternEmpty.wav
+
+#begin LantSelect.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:LantSelect.wav
+
 #begin Level3TileSheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -349,6 +403,42 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Level3TileSheet.png
+
+#begin Level4Tilemap.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Level4Tilemap.png
+
+#begin Level5Tilemap.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Level5Tilemap.png
+
+#begin LightStalker.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:LightStalker.png
 
 #begin LoadingScreen.png
 /importer:TextureImporter
@@ -386,6 +476,18 @@
 /processorParam:TextureFormat=Color
 /build:NewWheel.png
 
+#begin NightEmpty.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:NightEmpty.wav
+
+#begin NightSelect.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:NightSelect.wav
+
 #begin NightVision64.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -397,6 +499,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:NightVision64.png
+
+#begin NoneSelect.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:NoneSelect.wav
 
 #begin NonFlameFinalGear.png
 /importer:TextureImporter
@@ -416,6 +524,12 @@
 /processorParam:Quality=Best
 /build:Objective.wav
 
+#begin ObjectiveWarn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:ObjectiveWarn.wav
+
 #begin particle.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -434,6 +548,12 @@
 /processorParam:Quality=Best
 /build:Pickup.wav
 
+#begin PickupWarn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:PickupWarn.wav
+
 #begin PixelFont.spritefont
 /importer:FontDescriptionImporter
 /processor:FontDescriptionProcessor
@@ -449,12 +569,6 @@
 
 #begin Snap.mp3
 /importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Snap.mp3
-
-#begin Snap.mp3
-/importer:Mp3Importer
 /processor:SongProcessor
 /processorParam:Quality=Best
 /build:Snap.mp3
@@ -464,6 +578,18 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:SpikeHurt.wav
+
+#begin SpikeWarn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:SpikeWarn.wav
+
+#begin StalkerWarn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:StalkerWarn.wav
 
 #begin StartGear.png
 /importer:TextureImporter
@@ -621,9 +747,27 @@
 /processorParam:TextureFormat=Color
 /build:UIPatch.png
 
+#begin UnlockedOrb.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:UnlockedOrb.png
+
 #begin VentHurt.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:VentHurt.wav
+
+#begin VentWarn.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:VentWarn.wav
 

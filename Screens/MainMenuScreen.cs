@@ -4,6 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using Microsoft.Xna.Framework.Media;
+using Microsoft.Xna.Framework.Content;
+using System.Windows.Forms;
 
 namespace DungeonDweller.Screens
 {
@@ -13,7 +16,7 @@ namespace DungeonDweller.Screens
         private MenuEntry[] _itemEntries = new MenuEntry[3];
 
 
-        Cube cube;
+        Song MainMenu;
 
         bool declarecube = false;
 
@@ -24,7 +27,7 @@ namespace DungeonDweller.Screens
             var exitMenuEntry = new MenuEntryImage("Exit", "ExitWheel");
 
             playGameMenuEntry.Selected += PlayGameMenuEntrySelected;
-            NewGameMenuEntry.Selected += NewGameMenuEntrySelected;
+            NewGameMenuEntry.Selected += OnNew;
             exitMenuEntry.Selected += OnCancel;
 
             _itemEntries[0] = playGameMenuEntry;
@@ -34,6 +37,8 @@ namespace DungeonDweller.Screens
             MenuEntries.Add(playGameMenuEntry);
             MenuEntries.Add(NewGameMenuEntry);
             MenuEntries.Add(exitMenuEntry);
+
+            
             
 
 
@@ -53,11 +58,29 @@ namespace DungeonDweller.Screens
                 case 3:
                     Lev = new Level3();
                     break;
+                case 4:
+                    Lev = new Level4();
+                    break;
+                case 5:
+                    Lev = new Level5();
+                    break;
+                case 6:
+                    Lev = new Level6();
+                    break;
             }
             LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, Lev);
         }
 
-        
+        private void OnNew(object sender, PlayerIndexEventArgs e)
+        {
+            const string message = "Are you sure you want to start a new game?";
+            var confirmExitMessageBox = new MessageBoxScreen(message);
+
+            confirmExitMessageBox.Accepted += NewGameMenuEntrySelected;
+
+            ScreenManager.AddScreen(confirmExitMessageBox, e.PlayerIndex);
+        }
+
 
         private void NewGameMenuEntrySelected(object sender, PlayerIndexEventArgs e)
         {
@@ -66,7 +89,7 @@ namespace DungeonDweller.Screens
             LoadingScreen.Load(ScreenManager, true, e.PlayerIndex, new Level1());
         }
 
-        protected override void OnCancel(PlayerIndex playerIndex)
+        protected override void OnCancel( PlayerIndex playerIndex)
         {
             const string message = "Are you sure you want to exit this sample?";
             var confirmExitMessageBox = new MessageBoxScreen(message);
@@ -85,10 +108,10 @@ namespace DungeonDweller.Screens
 
         public override void Update(GameTime gameTime, bool otherScreenHasFocus, bool coveredByOtherScreen)
         {
-            if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
-            declarecube = true;
+            //if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
+            //declarecube = true;
 
-            cube.Update(gameTime);
+            //cube.Update(gameTime);
             base.Update(gameTime, otherScreenHasFocus, coveredByOtherScreen);
         }
 
@@ -106,8 +129,8 @@ namespace DungeonDweller.Screens
 
             spriteBatch.Begin();
 
-            if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
-            declarecube = true;
+            //if(!declarecube) cube = new Cube((DungeonDwellerGame)ScreenManager.Game);
+            //declarecube = true;
 
             //cube.Draw();
 

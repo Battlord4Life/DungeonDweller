@@ -31,7 +31,7 @@ namespace DungeonDweller.Screens
         /// </summary>
         private SpriteFont _gameFont;
 
- 
+
 
         //Resources used for the level
 
@@ -39,6 +39,8 @@ namespace DungeonDweller.Screens
         /// Hero to control
         /// </summary>
         private Hero _hero;
+
+        private Vector2 PrevheroPos;
 
         /// <summary>
         /// Exit to go to
@@ -136,6 +138,8 @@ namespace DungeonDweller.Screens
         /// </summary>
         private float _DamageTimer = 0;
 
+
+        public bool SFX = true;
         /// <summary>
         /// Hurt Sound Effect
         /// </summary>
@@ -147,6 +151,11 @@ namespace DungeonDweller.Screens
         private SoundEffect _Objective;
         private SoundEffect _Pickup;
         private SoundEffect _DoorOpen;
+
+        private SoundEffect _SpikeWarn;
+        private SoundEffect _GearWarn;
+        private SoundEffect _PickupWarn;
+        private SoundEffect _ObjectiveWarn;
 
         /// <summary>
         /// Level Gimmick to count lanterns lit
@@ -175,8 +184,8 @@ namespace DungeonDweller.Screens
             _GameplaySprites = new();
             _UISprites = new();
 
-            
-            
+
+
         }
 
         // Load graphics content for the game
@@ -186,7 +195,7 @@ namespace DungeonDweller.Screens
             if (_content == null)
                 _content = new ContentManager(ScreenManager.Game.Services, "Content");
 
-            
+
 
             //Dont know why I do this - Maybe hold over
             _inputManager = new();
@@ -207,17 +216,17 @@ namespace DungeonDweller.Screens
 
             //Creates a new hero and exit then adds them to the gameplay sprites
             _hero = new Hero(new Vector2(9, 19), _inputManager);
-           
+
             _exit = new ExitSprite(new(9, 11));
 
             _GameplaySprites.Add(_exit);
             _GameplaySprites.Add(_hero);
 
             //Adds other set sprites that dont change
-            _GameplaySprites.Add(new LightGearEnemy(new Vector2( 3,  9),  5, false, 100));
-            _GameplaySprites.Add(new LightGearEnemy(new Vector2(14,  9),  5, false, 100));
-            _GameplaySprites.Add(new LanternSprite(new Vector2(  9, 15)));
-            _GameplaySprites.Add(new NightVisionSprite(new Vector2( 9,  18)));
+            _GameplaySprites.Add(new LightGearEnemy(new Vector2(3, 9), 5, false, 100));
+            _GameplaySprites.Add(new LightGearEnemy(new Vector2(14, 9), 5, false, 100));
+            _GameplaySprites.Add(new LanternSprite(new Vector2(9, 15)));
+            //_GameplaySprites.Add(new NightVisionSprite(new Vector2(9, 18)));
             _GameplaySprites.Add(new Torch(new Vector2(9, 13)));
 
             //Gets A list of possible spots for an item to be
@@ -227,13 +236,13 @@ namespace DungeonDweller.Screens
                 new(0 , 19 ),
                 new(19, 0 )
             };
-            List<Vector2> Torch2Spots = new() 
+            List<Vector2> Torch2Spots = new()
             {
                 new( 3,  2),
                 new( 9,  2),
                 new( 15,  2)
-            
-            
+
+
             };
             List<Vector2> Torch3Spots = new(){
                 new( 3,  19),
@@ -242,14 +251,14 @@ namespace DungeonDweller.Screens
             };
 
 
-            
+
 
 
             //adds random items to the level
             _GameplaySprites.Add(new CameraSprite((Vector2)RandomHelper.RandomFromList(CameraSpots)));
             _GameplaySprites.Add(new Torch((Vector2)RandomHelper.RandomFromList(Torch2Spots)));
             _GameplaySprites.Add(new Torch((Vector2)RandomHelper.RandomFromList(Torch3Spots)));
-            
+
 
             //adds the particle system
             rain = new(ScreenManager.Game, new(0, 0, 1280, 10));
@@ -291,6 +300,13 @@ namespace DungeonDweller.Screens
             _Pickup = _content.Load<SoundEffect>("Pickup");
             _DoorOpen = _content.Load<SoundEffect>("DoorOpen");
 
+            _SpikeWarn = _content.Load<SoundEffect>("SpikeWarn");
+            _GearWarn = _content.Load<SoundEffect>("GearWarn");
+            _ObjectiveWarn = _content.Load<SoundEffect>("ObjectiveWarn");
+            _PickupWarn = _content.Load<SoundEffect>("PickupWarn");
+
+
+
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
             // it should not try to catch up.
@@ -313,7 +329,7 @@ namespace DungeonDweller.Screens
             if (RandomHelper.Next(2) == 0)
             {
                 _backgroundSprite.SetCell(2, 0, 2);
-                
+
             }
             else
             {
@@ -401,6 +417,9 @@ namespace DungeonDweller.Screens
                 foreach (ISprite s in _UISprites) s.Update(gameTime);
                 _darkTileset.Update(gameTime);
 
+                if (_hero.Position != PrevheroPos) SFX = true;
+                PrevheroPos = _hero.Position;
+
                 foreach (ISprite s in _backmidgroundSprites) s.UpdateLightMap(_darkTileset);
                 foreach (ISprite s in _midgroundSprites) s.UpdateLightMap(_darkTileset);
                 foreach (ISprite s in _GameplaySprites) s.UpdateLightMap(_darkTileset);
@@ -409,9 +428,51 @@ namespace DungeonDweller.Screens
 
                 //if (!_hero.Items.Contains("Lantern")) if ((_hero.Position / _backgroundSprite._tileWidth) == new Vector2(10, 9)) { ScreenManager.GameSaveState.HasLantern = true; _hero.Items.Add("Lant"); }
                 //if (!_hero.Items.Contains("Camera")) if((_hero.Position/_backgroundSprite._tileWidth) == new Vector2(19, 19)) { ScreenManager.GameSaveState.HasCamera = true; _hero.Items.Add("Cam"); }
-               
+
 
                 CollisionChecker(_GameplaySprites, gameTime);
+
+                if (SFX)
+                {
+
+                    foreach (ISprite sprite in _GameplaySprites)
+                    {
+                        if (sprite.Name == "Flame" || sprite.Name == "Gear")
+                        {
+
+                            if ((_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                            (_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y + 1) ||
+                        (_hero.TilePosition.X == (sprite.Position / 64).X + 2 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                        (_hero.TilePosition.X == (sprite.Position / 64).X + 2 && _hero.TilePosition.Y == (sprite.Position / 64).Y + 1) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X + 1) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y + 2 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y + 2 && _hero.TilePosition.X == (sprite.Position / 64).X + 1)) _GearWarn.Play();
+                        }
+
+                        if ((_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                            (_hero.TilePosition.X == (sprite.Position / 64).X + 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                            (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
+                            (_hero.TilePosition.Y == (sprite.Position / 64).Y + 1 && _hero.TilePosition.X == (sprite.Position / 64).X))
+                        {
+
+
+                            if ((sprite.Name == "NightVisionSprite" && !((NightVisionSprite)sprite).Collected) ||
+                                (sprite.Name == "LanternSprite" && !((LanternSprite)sprite).Collected) ||
+                                (sprite.Name == "FlashLightSprite" && !((FlashlightSprite)sprite).Collected) ||
+                                (sprite.Name == "CameraSprite" && !((CameraSprite)sprite).Collected)) _PickupWarn.Play();
+
+                            if (sprite.Name == "Torch" || (sprite.Name == "Exit" && _exit.Open)) _ObjectiveWarn.Play();
+                        }
+
+                        if (_backgroundSprite.IsHaz((int)_hero.TilePosition.X + 1, (int)_hero.TilePosition.Y) ||
+                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X - 1, (int)_hero.TilePosition.Y) ||
+                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X, (int)_hero.TilePosition.Y - 1) ||
+                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X, (int)_hero.TilePosition.Y + 1)) _SpikeWarn.Play(0.125f, 0, 0);
+
+                    }
+                    SFX = false;
+                }
 
 
                 Vector2 XY = _hero.Position / _backgroundSprite._tileWidth;
@@ -432,14 +493,14 @@ namespace DungeonDweller.Screens
                     }
                 }
 
-                if(LanterLeft == 0 && !_exit.Open)
+                if (LanterLeft == 0 && !_exit.Open)
                 {
                     _exit.Open = true;
                     _DoorOpen.Play();
                 }
 
                 if (HeroHealth <= 0) _inputManager.Active = false;
-                
+
 
                 if (_hero.UpdateSave)
                 {
@@ -477,7 +538,7 @@ namespace DungeonDweller.Screens
                 ScreenManager.AddScreen(new PauseMenuScreen(1), ControllingPlayer);
 
             }
-            
+
         }
 
         public override void Draw(GameTime gameTime)
@@ -516,15 +577,15 @@ namespace DungeonDweller.Screens
 
 
 
-            spriteBatch.DrawString(_gameFont, "Lantern Light", new Vector2(640, _gameFont.MeasureString("Lantern Light").Y /2), Color.White, 0, _gameFont.MeasureString("Lantern Light")/2, 1.5f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(_gameFont, HeroHealth.ToString() + "/" + MaxHeroHealth.ToString(), new Vector2(640, 1280 + 55), Color.Crimson, 0, _gameFont.MeasureString(HeroHealth.ToString() + "/" + MaxHeroHealth.ToString())/2, 4f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(_gameFont, "Lantern Light", new Vector2(640, _gameFont.MeasureString("Lantern Light").Y / 2), Color.White, 0, _gameFont.MeasureString("Lantern Light") / 2, 1.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(_gameFont, HeroHealth.ToString() + "/" + MaxHeroHealth.ToString(), new Vector2(640, 1280 + 55), Color.Crimson, 0, _gameFont.MeasureString(HeroHealth.ToString() + "/" + MaxHeroHealth.ToString()) / 2, 4f, SpriteEffects.None, 0);
 
             StringBuilder Bar = new();
             float displace = 0;
-             
-            for(int i = 0; i < 10; i++)
+
+            for (int i = 0; i < 10; i++)
             {
-                spriteBatch.DrawString(_gameFont, "#", new Vector2((i  * _gameFont.MeasureString("# ").X * 1.5f) + 425, 1280 + 165), _DamageTimer - gameTime.TotalGameTime.TotalSeconds > displace ? Color.Red : Color.White, 0, new Vector2(0, 0), 4F, SpriteEffects.None, 0);
+                spriteBatch.DrawString(_gameFont, "#", new Vector2((i * _gameFont.MeasureString("# ").X * 1.5f) + 425, 1280 + 165), _DamageTimer - gameTime.TotalGameTime.TotalSeconds > displace ? Color.Red : Color.White, 0, new Vector2(0, 0), 4F, SpriteEffects.None, 0);
                 displace += .5f;
             }
 
@@ -533,8 +594,8 @@ namespace DungeonDweller.Screens
 
 
             spriteBatch.DrawString(_gameFont, ((_hero.Batteries)).ToString() + " Batteries", new Vector2(40, 1280 + 41), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(_gameFont, ((_hero.OilBottle)).ToString() + " Bottles of Oil", new Vector2(20, 1280 +120), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
-            spriteBatch.DrawString(_gameFont, ((_hero.Bulbs)).ToString() + " Bulbs", new Vector2(80, 1280 +  200), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(_gameFont, ((_hero.OilBottle)).ToString() + " Bottles of Oil", new Vector2(20, 1280 + 120), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
+            spriteBatch.DrawString(_gameFont, ((_hero.Bulbs)).ToString() + " Bulbs", new Vector2(80, 1280 + 200), Color.White, 0, new Vector2(0, 0), 1.5f, SpriteEffects.None, 0);
 
 
 
@@ -542,18 +603,18 @@ namespace DungeonDweller.Screens
             {
                 if (s == "None")
                 {
-                    
+
                     //spriteBatch.DrawString(_gameFont, s, new Vector2(1280, 1280 + 13), 0 == _hero.SelectedItem ? Color.Yellow : Color.White, 0, new Vector2(_gameFont.MeasureString(s).X + (0 == _hero.SelectedItem ? 30 : 0), 0), 1.25f, SpriteEffects.None, 0);
                 }
                 if (s == "Flashlight")
                 {
                     int Vert = 1280 + (24 * 4);
                     if (_hero.SelectedItem == 1) Vert = 1280 + 8;
-                    spriteBatch.Draw(_UIFlashlight, new Vector2((240 * 4)+2, Vert), Color.White);
+                    spriteBatch.Draw(_UIFlashlight, new Vector2((240 * 4) + 2, Vert), Color.White);
 
-                    
 
-                    for(int i = 0; i < 100; i++)
+
+                    for (int i = 0; i < 100; i++)
                     {
                         spriteBatch.Draw(_UIBar, new Vector2((240 * 4) + 28, Vert + 20 + i), _hero.FlashlightLeft >= 100 - 1 - i ? Color.Yellow : Color.Transparent);
                     }
@@ -568,7 +629,7 @@ namespace DungeonDweller.Screens
                     if (_hero.SelectedItem == 2)
                     {
                         Vert = 1280 + 8;
-                        spriteBatch.Draw(_UILanternSel, new Vector2((240 * 4) + 82, Vert ), Color.Gray);
+                        spriteBatch.Draw(_UILanternSel, new Vector2((240 * 4) + 82, Vert), Color.Gray);
                     }
                     else
                     {
@@ -579,10 +640,10 @@ namespace DungeonDweller.Screens
 
                     for (int i = 0; i < 25; i++)
                     {
-                        spriteBatch.Draw(_UIBar, new Vector2((240 * 4) + 28+80, Vert + 80 + i), _hero.LanternLeft >= 25 - 1 - i ? _hero.LanternLeft < 25 - i + 2 ? _hero.SelectedItem == 2 ? Color.Red :  Color.Tan : Color.Tan :Color.Transparent);
+                        spriteBatch.Draw(_UIBar, new Vector2((240 * 4) + 28 + 80, Vert + 80 + i), _hero.LanternLeft >= 25 - 1 - i ? _hero.LanternLeft < 25 - i + 2 ? _hero.SelectedItem == 2 ? Color.Red : Color.Tan : Color.Tan : Color.Transparent);
                     }
 
-                   
+
                     //spriteBatch.DrawString(_gameFont, "Lantern: " + _hero.LanternLeft.ToString("N0") + "s of Oil", new Vector2(1280, 1280+ 113), 2 == _hero.SelectedItem ? Color.Yellow : Color.White, 0, new Vector2(_gameFont.MeasureString("Lantern: " + _hero.LanternLeft.ToString("N0") + "s of Oil").X + (2 == _hero.SelectedItem ? 30 : 0), 0), 1.25f, SpriteEffects.None, 0);
                 }
                 if (s == "Camera")
@@ -591,7 +652,7 @@ namespace DungeonDweller.Screens
                     if (_hero.SelectedItem == 3)
                     {
                         Vert = 1280 + 8;
-                        
+
                     }
 
                     if (_hero.BulbBroken)
@@ -602,7 +663,7 @@ namespace DungeonDweller.Screens
                     {
                         spriteBatch.Draw(_UICamera, new Vector2((240 * 4) + 162, Vert), Color.White);
                     }
-                    
+
 
                     //spriteBatch.DrawString(_gameFont, "Camera: " + (_hero.BulbBroken ? ("bulb broken") : ("used " + _hero.CameraUse.ToString("N0") + " times")), new Vector2(1280, 1280+ 162), 3 == _hero.SelectedItem ? Color.Yellow : Color.White, 0, new Vector2(_gameFont.MeasureString("Camera: used " + _hero.CameraUse.ToString("N0") + " times").X + (3 == _hero.SelectedItem ? 30 : 0), 0), 1.25f, SpriteEffects.None, 0);
                 }
@@ -618,13 +679,13 @@ namespace DungeonDweller.Screens
 
                     Color nvcolor = new Color((int)((_hero.NightVisionLeft) * 50) + 100, (int)((_hero.NightVisionLeft) * 50) + 100, (int)((_hero.NightVisionLeft) * 50) + 100);
 
-                    spriteBatch.Draw(_UINightVision, new Vector2((240 * 4) + 242, Vert),nvcolor);
+                    spriteBatch.Draw(_UINightVision, new Vector2((240 * 4) + 242, Vert), nvcolor);
                     spriteBatch.Draw(_UIPatch, new Vector2((240 * 4) + 20 + 240, 1280 + (38 * 4)), Color.White);
 
                     //spriteBatch.DrawString(_gameFont, "Night Vision: " + _hero.NightVisionLeft.ToString("N0") + "s left", new Vector2(1280, 1280 +213), 4 == _hero.SelectedItem ? Color.Yellow : Color.White, 0, new Vector2(_gameFont.MeasureString("Night Vision: " + _hero.NightVisionLeft.ToString("N0") + "s left").X + (4 == _hero.SelectedItem ? 30 : 0), 0), 1.25f, SpriteEffects.None, 0);
                 }
 
-      
+
             }
 
             if (HeroHealth <= 0)
@@ -633,7 +694,7 @@ namespace DungeonDweller.Screens
                 spriteBatch.DrawString(_gameFont, "ESC while you can!", new Vector2((1280 / 2), 1280 - 100), Color.White, 0, new Vector2(63, 10), 3.5f, SpriteEffects.None, 0);
             }
 
-            
+
 
 
 

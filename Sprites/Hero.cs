@@ -117,6 +117,14 @@ namespace DungeonDweller.Sprites
         private SoundEffect _Refill;
         private SoundEffect _Camera;
         private SoundEffect _CameraBreak;
+        private SoundEffect _NoneSelect;
+        private SoundEffect _FlashSelect;
+        private SoundEffect _FlashEmpty;
+        private SoundEffect _LantSelect;
+        private SoundEffect _LantEmpty;
+        private SoundEffect _CamSelect;
+        private SoundEffect _NightSelect;
+        private SoundEffect _NightEmpty;
 
         public Hero(Vector2 Pos, InputManager input)
         {
@@ -175,6 +183,14 @@ namespace DungeonDweller.Sprites
             _Refill = content.Load<SoundEffect>("Refill");
             _Camera = content.Load<SoundEffect>("CameraShutter");
             _CameraBreak = content.Load<SoundEffect>("CameraBreak");
+            _NoneSelect = content.Load<SoundEffect>("NoneSelect");
+            _FlashSelect = content.Load<SoundEffect>("FlashSelect");
+            _FlashEmpty = content.Load<SoundEffect>("FlashEmpty");
+            _LantSelect = content.Load<SoundEffect>("LantSelect");
+            _LantEmpty = content.Load<SoundEffect>("LanternEmpty");
+            _CamSelect = content.Load<SoundEffect>("CamSelect");
+            _NightSelect = content.Load<SoundEffect>("NightSelect");
+            _NightEmpty = content.Load<SoundEffect>("NightEmpty");
         }
 
         public void Update(GameTime gameTime)
@@ -215,6 +231,7 @@ namespace DungeonDweller.Sprites
             {
                 SelectedItem = 0;
                 ToolActive = false;
+                _NoneSelect.Play();
                 Idle = false;
 
             }
@@ -223,6 +240,8 @@ namespace DungeonDweller.Sprites
                 SelectedItem = 1;
                 
                 ToolActive = FlashlightLeft > 0f;
+                if (ToolActive) _FlashSelect.Play();
+                else _FlashEmpty.Play();
                 Idle = false;
 
             }
@@ -230,6 +249,8 @@ namespace DungeonDweller.Sprites
             {
                 SelectedItem = 2;
                 ToolActive = LanternLeft > 0f;
+                if (ToolActive) _LantSelect.Play();
+                else _LantEmpty.Play();
                 Idle = false;
 
             }
@@ -237,6 +258,7 @@ namespace DungeonDweller.Sprites
             {
                 SelectedItem = 3;
                 ToolActive = !BulbBroken;
+                _CamSelect.Play();
                 Idle = false;
 
             }
@@ -244,6 +266,8 @@ namespace DungeonDweller.Sprites
             {
                 SelectedItem = 4;
                 ToolActive = NightVisionLeft > 0f;
+                if (ToolActive) _NightSelect.Play();
+                else _NightEmpty.Play();
                 Idle = false;
 
             }

@@ -137,6 +137,10 @@ namespace DungeonDweller.Screens
         /// </summary>
         private float _DamageTimer = 0;
 
+        public bool SFX = true;
+
+        public Vector2 PrevHeroPos;
+
         /// <summary>
         /// Hurt Sound Effect
         /// </summary>
@@ -148,6 +152,12 @@ namespace DungeonDweller.Screens
         private SoundEffect _Objective;
         private SoundEffect _Pickup;
         private SoundEffect _DoorOpen;
+
+        private SoundEffect _SpikeWarn;
+        private SoundEffect _VentWarn;
+        private SoundEffect _GearWarn;
+        private SoundEffect _PickupWarn;
+        private SoundEffect _ObjectiveWarn;
 
 
 
@@ -279,6 +289,12 @@ namespace DungeonDweller.Screens
             _Objective = _content.Load<SoundEffect>("Objective");
             _Pickup = _content.Load<SoundEffect>("Pickup");
             _DoorOpen = _content.Load<SoundEffect>("DoorOpen");
+
+            _SpikeWarn = _content.Load<SoundEffect>("SpikeWarn");
+            _GearWarn = _content.Load<SoundEffect>("GearWarn");
+            _ObjectiveWarn = _content.Load<SoundEffect>("ObjectiveWarn");
+            _PickupWarn = _content.Load<SoundEffect>("PickupWarn");
+            _VentWarn = _content.Load<SoundEffect>("VentWarn");
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
@@ -412,6 +428,9 @@ namespace DungeonDweller.Screens
                 foreach (ISprite s in _UISprites) s.Update(gameTime);
                 _darkTileset.Update(gameTime);
 
+                if (PrevHeroPos != _hero.Position) SFX = true;
+                PrevHeroPos = _hero.Position;
+
                 foreach (ISprite s in _backmidgroundSprites) s.UpdateLightMap(_darkTileset);
                 foreach (ISprite s in _midgroundSprites) s.UpdateLightMap(_darkTileset);
                 foreach (ISprite s in _GameplaySprites) s.UpdateLightMap(_darkTileset);
@@ -423,6 +442,53 @@ namespace DungeonDweller.Screens
 
 
                 CollisionChecker(_GameplaySprites, gameTime);
+
+                if (SFX)
+                {
+
+                    foreach (ISprite sprite in _GameplaySprites)
+                    {
+                        if (sprite.Name == "Flame" || sprite.Name == "Gear")
+                        {
+
+                            if ((_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                            (_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y + 1) ||
+                        (_hero.TilePosition.X == (sprite.Position / 64).X + 2 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                        (_hero.TilePosition.X == (sprite.Position / 64).X + 2 && _hero.TilePosition.Y == (sprite.Position / 64).Y + 1) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X + 1) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y + 2 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
+                        (_hero.TilePosition.Y == (sprite.Position / 64).Y + 2 && _hero.TilePosition.X == (sprite.Position / 64).X + 1)) _GearWarn.Play();
+                        }
+
+                        if ((_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                            (_hero.TilePosition.X == (sprite.Position / 64).X + 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                            (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
+                            (_hero.TilePosition.Y == (sprite.Position / 64).Y + 1 && _hero.TilePosition.X == (sprite.Position / 64).X))
+                        {
+
+
+                            if ((sprite.Name == "NightVisionSprite" && !((NightVisionSprite)sprite).Collected) ||
+                                (sprite.Name == "LanternSprite" && !((LanternSprite)sprite).Collected) ||
+                                (sprite.Name == "FlashLightSprite" && !((FlashlightSprite)sprite).Collected) ||
+                                (sprite.Name == "MedicPickup" && !((MedicPickup)sprite).Collected) ||
+                                (sprite.Name == "CameraSprite" && !((CameraSprite)sprite).Collected)) _PickupWarn.Play();
+
+                            if (sprite.Name == "Torch" || (sprite.Name == "Exit" && _exit.Open) || (sprite.Name == "FlameKey" && !((FlameKey)sprite).Collected)) _ObjectiveWarn.Play();
+                        }
+
+                        if (_backgroundSprite.IsHaz((int)_hero.TilePosition.X + 1, (int)_hero.TilePosition.Y) ||
+                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X - 1, (int)_hero.TilePosition.Y) ||
+                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X, (int)_hero.TilePosition.Y - 1) ||
+                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X, (int)_hero.TilePosition.Y + 1))
+                        {
+                            if (_backgroundSprite._map[(int)_hero.TilePosition.X, (int)_hero.TilePosition.Y] == 5) _VentWarn.Play(0.125f, 0, 0);
+                            else _SpikeWarn.Play(.125f, 0, 0);
+                        }
+
+                    }
+                    SFX = false;
+                }
 
 
                 Vector2 XY = _hero.Position / _backgroundSprite._tileWidth;
@@ -968,7 +1034,7 @@ namespace DungeonDweller.Screens
             ScreenManager.Game.Components.Remove(rain);
             ScreenManager.GameSaveState.Level = 4;
             ScreenManager.Save(ScreenManager.GameSaveState);
-            ScreenManager.AddScreen(new Level3(), ControllingPlayer);
+            ScreenManager.AddScreen(new Level4(), ControllingPlayer);
             ExitScreen();
         }
 
@@ -977,7 +1043,7 @@ namespace DungeonDweller.Screens
             ScreenManager.Game.Components.Remove(rain);
             ScreenManager.GameSaveState.Level = 5;
             ScreenManager.Save(ScreenManager.GameSaveState);
-            ScreenManager.AddScreen(new Level3(), ControllingPlayer);
+            ScreenManager.AddScreen(new Level5(), ControllingPlayer);
             ExitScreen();
         }
     }

@@ -1,17 +1,13 @@
-﻿using System;
-using System.Threading;
+﻿using DungeonDweller.Archetecture;
+using DungeonDweller.Sprites;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using DungeonDweller.Archetecture;
+using SharpDX.Direct3D9;
+using System;
 using System.Collections.Generic;
-using DungeonDweller.Sprites;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
-using System.Reflection.Metadata;
-using SharpDX.Direct2D1;
-using Microsoft.Xna.Framework.Audio;
-using SharpDX.MediaFoundation;
 using System.Text;
 
 
@@ -22,7 +18,7 @@ namespace DungeonDweller.Screens
     // This screen implements the actual game logic. It is just a
     // placeholder to get the idea across: you'll probably want to
     // put some more interesting gameplay in here!
-    public class Level2 : GameScreen
+    public class Level6 : GameScreen
     {
         //Used for ScreenManager
 
@@ -48,7 +44,12 @@ namespace DungeonDweller.Screens
         /// <summary>
         /// Exit to go to
         /// </summary>
-        private ExitSprite _exit;
+        private FireOrb _exit;
+
+        private LightDweller _stalkerL;
+        private DarkDweller _stalkerD; 
+        private LightDweller _stalkerL2;
+        private DarkDweller _stalkerD2;
 
         /// <summary>
         /// Random 
@@ -141,11 +142,6 @@ namespace DungeonDweller.Screens
         /// </summary>
         private float _DamageTimer = 0;
 
-
-        public bool SFX = true;
-
-        private Vector2 PrevHeroPos;
-
         /// <summary>
         /// Hurt Sound Effect
         /// </summary>
@@ -158,19 +154,29 @@ namespace DungeonDweller.Screens
         private SoundEffect _Pickup;
         private SoundEffect _DoorOpen;
 
-        private SoundEffect _SpikeWarn;
+        private SoundEffect _GlassWarn;
+        private SoundEffect _WalkwayWarn;
+        private SoundEffect _StalkerWarn;
         private SoundEffect _GearWarn;
         private SoundEffect _PickupWarn;
         private SoundEffect _ObjectiveWarn;
 
+
+        public bool Victory = false;
+
+
         /// <summary>
         /// Level Gimmick to count lanterns lit
         /// </summary>
-        public int LanterLeft = 3;
+        public int TorchLeft = 4;
+        public int KeyLeft = 4;
+
 
         public bool Refill = false;
+        private bool SFX;
+        private Vector2 PrevHeroPosition;
 
-        public Level2()
+        public Level6()
         {
             //Sets up Screen Transistions
             TransitionOnTime = TimeSpan.FromSeconds(1.5);
@@ -208,7 +214,7 @@ namespace DungeonDweller.Screens
 
 
             //Sets the background and Darkness Overlay
-            _backgroundSprite = new Tilemap("Level2Map.txt");
+            _backgroundSprite = new Tilemap("Level6Map.txt");
             _darkTileset = new LightTileMap("LightMap.txt", _backgroundSprite);
             _UIBackground = _content.Load<Texture2D>("UIBackground1280x256");
             _UIBar = _content.Load<Texture2D>("UIBar");
@@ -221,77 +227,43 @@ namespace DungeonDweller.Screens
             _UINightVision = _content.Load<Texture2D>("UINightVision");
 
             //Creates a new hero and exit then adds them to the gameplay sprites
-            _hero = new Hero(new Vector2( 0,  0), _inputManager);
+            _hero = new Hero(new Vector2(10, 19), _inputManager);
 
-            _exit = new ExitSprite(new( 0, 19));
+            _exit = new FireOrb(new(8, 9));
+
+            _stalkerL = new LightDweller(new Vector2(RandomHelper.Next(4), RandomHelper.Next(4)), 200, _backgroundSprite); 
+            _stalkerD = new DarkDweller(new Vector2(9, 10), 1500, _backgroundSprite); 
+            _stalkerL2 = new LightDweller(new Vector2(RandomHelper.Next(16,20), RandomHelper.Next(4)), 200, _backgroundSprite); 
+            _stalkerD2 = new DarkDweller(new Vector2(10, 10), 1000, _backgroundSprite); 
 
             _GameplaySprites.Add(_exit);
             _GameplaySprites.Add(_hero);
+
+
+            _GameplaySprites.Add(new Torch(new Vector2(0, 0)));
+            _GameplaySprites.Add(new Torch(new Vector2(19, 0)));
+            _GameplaySprites.Add(new Torch(new Vector2(19, 19)));
+            _GameplaySprites.Add(new Torch(new Vector2(0, 19)));
+            _GameplaySprites.Add(new FlameKey(new Vector2(14, 16)));
+            _GameplaySprites.Add(new FlameKey(new Vector2(4, 16)));
+            _GameplaySprites.Add(new FlameKey(new Vector2(4, 6)));
+            _GameplaySprites.Add(new FlameKey(new Vector2(14, 6)));
+
+            _GameplaySprites.Add(new NonLightGearEnemy(new Vector2(3, 9), 5, false, 250));
+            _GameplaySprites.Add(new NonLightGearEnemy(new Vector2(14, 9), 5, false, 250));
+
+            _GameplaySprites.Add(_stalkerL);
+            _GameplaySprites.Add(_stalkerD);
+            _GameplaySprites.Add(_stalkerL2);
+            _GameplaySprites.Add(_stalkerD2);
 
             //Adds other set sprites that dont change
 
 
 
-            
-            _GameplaySprites.Add(new Torch(new Vector2(19, 0)));
-            _GameplaySprites.Add(new Torch(new Vector2( 19, 19)));
 
 
-            int Torch3X = RandomHelper.Next(0, 6);
-            int Torch3Y = (RandomHelper.Next(3) + 5 + (Torch3X));
 
-            _GameplaySprites.Add(new Torch(new Vector2(Torch3X, Torch3Y)));
-
-            int ItemChoice1 = RandomHelper.Next(0, 10);
-            int ItemChoice2 = RandomHelper.Next(0, 10);
-
-            int ItemX1 = RandomHelper.Next(4, 13);
-            int ItemX2 = RandomHelper.Next(3, 13);
-
-            int ItemY1 = RandomHelper.Next(1, 1 + ((ItemX1 - (ItemX1 % 2)) / 2));
-            int ItemY2 = RandomHelper.Next(19 - ((ItemX2 - (ItemX2 % 2)) / 2), 19);
-
-            switch (ItemChoice1)
-            {
-                case 0 or 9:
-
-                    break;
-                case 1 or 4 or 7:
-                    _GameplaySprites.Add(new FlashlightSprite(new Vector2(ItemX1, ItemY1 )));
-                    break;
-                case 2 or 5 or 8:
-                    _GameplaySprites.Add(new LanternSprite(new Vector2(ItemX1  , ItemY1  )));
-
-                    break;
-                case 3:
-                    _GameplaySprites.Add(new CameraSprite(new Vector2(ItemX1  , ItemY1  )));
-
-                    break;
-            }
-
-            switch (ItemChoice2)
-            {
-                case 0 or 9:
-
-                    break;
-                case 1 or 4 or 7:
-                    _GameplaySprites.Add(new FlashlightSprite(new Vector2(ItemX2  , ItemY2  )));
-                    break;
-                case 2 or 5 or 8:
-                    _GameplaySprites.Add(new LanternSprite(new Vector2(ItemX2  , ItemY2  )));
-
-                    break;
-                case 3:
-                    _GameplaySprites.Add(new CameraSprite(new Vector2(ItemX2  , ItemY2  )));
-
-                    break;
-            }
-
-
-            int CameraX = RandomHelper.Next(0, 5);
-            int CameraY = RandomHelper.Next(9 + CameraX, 14);
-
-            _GameplaySprites.Add(new CameraSprite(new Vector2(CameraX  , CameraY  )));
 
 
 
@@ -306,6 +278,10 @@ namespace DungeonDweller.Screens
             foreach (ISprite s in _GameplaySprites) s.LoadContent(_content);
             foreach (ISprite s in _UISprites) s.LoadContent(_content);
             _darkTileset.LoadContent(_content);
+
+
+
+
 
 
 
@@ -328,6 +304,7 @@ namespace DungeonDweller.Screens
             _gameFont = _content.Load<SpriteFont>("PixelFont");
             //_Hurt = _content.Load<SoundEffect>("Snap");
 
+
             _VentHurt = _content.Load<SoundEffect>("VentHurt");
             _SpikeHurt = _content.Load<SoundEffect>("SpikeHurt");
             _GearHurt = _content.Load<SoundEffect>("GearHurt");
@@ -335,160 +312,37 @@ namespace DungeonDweller.Screens
             _Pickup = _content.Load<SoundEffect>("Pickup");
             _DoorOpen = _content.Load<SoundEffect>("DoorOpen");
 
-            _SpikeWarn = _content.Load<SoundEffect>("SpikeWarn");
+            _WalkwayWarn = _content.Load<SoundEffect>("SpikeWarn");
+            _StalkerWarn = _content.Load<SoundEffect>("StalkerWarn");
             _GearWarn = _content.Load<SoundEffect>("GearWarn");
             _ObjectiveWarn = _content.Load<SoundEffect>("ObjectiveWarn");
             _PickupWarn = _content.Load<SoundEffect>("PickupWarn");
+            _GlassWarn = _content.Load<SoundEffect>("VentWarn");
+
+            int spikesLeft = 25;
+
+            while (spikesLeft > 0)
+            {
+                int X = RandomHelper.Next(1,19);
+                int Y = RandomHelper.Next(1,19);
+
+                
+
+                    if (_backgroundSprite.GetCell(X, Y) == 1 || _backgroundSprite.GetCell(X, Y) == 2)
+                    {
+                        _backgroundSprite.SetCell(X, Y, _backgroundSprite.GetCell(X, Y) + 4);
+                        spikesLeft--;
+                    }
+                
+            }
 
             // once the load has finished, we use ResetElapsedTime to tell the game's
             // timing mechanism that we have just finished a very long frame, and that
             // it should not try to catch up.
-            int Diagonal1 = RandomHelper.Next(0, 8);
-            int Diagonal2 = RandomHelper.Next(0, 8);
-            _backgroundSprite.SetCell(Diagonal1, Diagonal1 + 4, 4);
-            _backgroundSprite.SetCell(Diagonal2, Diagonal2 + 4, 2);
-
-            int Wall11 = RandomHelper.Next(0, 2);
-            int Wall12 = RandomHelper.Next(0, 2);
-            int Wall13 = RandomHelper.Next(0, 2);
-
-            int Wall21 = RandomHelper.Next(0, 2);
-            int Wall22 = RandomHelper.Next(0, 2);
-            int Wall23 = RandomHelper.Next(0, 2);
-
-            int Wall11Num = RandomHelper.Next(1, 6); 
-            int Wall21Num = RandomHelper.Next(1, 6); 
-            int Wall22Num = RandomHelper.Next(0, 4); 
-            int Wall12Num = RandomHelper.Next(0, 4); 
-            int Wall23Num = RandomHelper.Next(0, 2); 
-            int Wall13Num = RandomHelper.Next(0, 2);
 
 
-            if (Wall11 == 0)
-            {
-                _backgroundSprite.SetCell(13, Wall11Num, 4);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(13+Wall11Num, 6, 4);
-            }
-
-            if (Wall12 == 0)
-            {
-                _backgroundSprite.SetCell(15, Wall12Num, 4);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(16 + Wall12Num, 4, 4);
-            }
-
-            if (Wall13 == 0)
-            {
-                _backgroundSprite.SetCell(17, Wall13Num, 4);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(18 + Wall13Num, 2, 4);
-            }
 
 
-            if (Wall21 == 0)
-            {
-                _backgroundSprite.SetCell(13, 13+Wall21Num, 4);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(13 + Wall21Num, 13, 4);
-            }
-
-            if (Wall22 == 0)
-            {
-                _backgroundSprite.SetCell(15, 16+Wall22Num, 4);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(16 + Wall22Num, 15, 4);
-            }
-
-            if (Wall23 == 0)
-            {
-                _backgroundSprite.SetCell(17, 18+Wall23Num, 4);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(18 + Wall23Num, 17, 4);
-            }
-
-            Wall11 = RandomHelper.Next(0, 2);
-            Wall12 = RandomHelper.Next(0, 2);
-            Wall13 = RandomHelper.Next(0, 2);
-
-            Wall21 = RandomHelper.Next(0, 2);
-            Wall22 = RandomHelper.Next(0, 2);
-            Wall23 = RandomHelper.Next(0, 2);
-
-            Wall11Num = RandomHelper.Next(1, 6);
-            Wall21Num = RandomHelper.Next(1, 6);
-            Wall22Num = RandomHelper.Next(0, 4);
-            Wall12Num = RandomHelper.Next(0, 4);
-            Wall23Num = RandomHelper.Next(0, 2);
-            Wall13Num = RandomHelper.Next(0, 2);
-
-
-            if (Wall11 == 0)
-            {
-                _backgroundSprite.SetCell(13, Wall11Num, 2);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(13 + Wall11Num, 6, 2);
-            }
-
-            if (Wall12 == 0)
-            {
-                _backgroundSprite.SetCell(15, Wall12Num, 2);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(16 + Wall12Num, 4, 2);
-            }
-
-            if (Wall13 == 0)
-            {
-                _backgroundSprite.SetCell(17, Wall13Num, 2);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(18 + Wall13Num, 2, 2);
-            }
-
-
-            if (Wall21 == 0)
-            {
-                _backgroundSprite.SetCell(13, 13 + Wall21Num, 2);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(13 + Wall21Num, 13, 2);
-            }
-
-            if (Wall22 == 0)
-            {
-                _backgroundSprite.SetCell(15, 16 + Wall22Num, 2);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(16 + Wall22Num, 15, 2);
-            }
-
-            if (Wall23 == 0)
-            {
-                _backgroundSprite.SetCell(17, 18 + Wall23Num, 2);
-            }
-            else
-            {
-                _backgroundSprite.SetCell(18 + Wall23Num, 17, 2);
-            }
 
             //if (RandomHelper.Next(2) == 0)
             //{
@@ -596,8 +450,15 @@ namespace DungeonDweller.Screens
                 foreach (ISprite s in _UISprites) s.Update(gameTime);
                 _darkTileset.Update(gameTime);
 
-                if (_hero.Position != PrevHeroPos) SFX = true;
-                PrevHeroPos = _hero.Position;
+                
+
+                if (PrevHeroPosition != _hero.Position) SFX = true;
+                PrevHeroPosition = _hero.Position;
+
+                _stalkerD.TargetTile = _hero.TilePosition;
+                _stalkerD2.TargetTile = _hero.TilePosition;
+                _stalkerL.TargetTile = _hero.TilePosition;
+                _stalkerL2.TargetTile = _hero.TilePosition;
 
                 foreach (ISprite s in _backmidgroundSprites) s.UpdateLightMap(_darkTileset);
                 foreach (ISprite s in _midgroundSprites) s.UpdateLightMap(_darkTileset);
@@ -616,42 +477,32 @@ namespace DungeonDweller.Screens
 
                     foreach (ISprite sprite in _GameplaySprites)
                     {
-                        if (sprite.Name == "Flame" || sprite.Name == "Gear")
-                        {
-
-                            if ((_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
-                            (_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y + 1) ||
-                        (_hero.TilePosition.X == (sprite.Position / 64).X + 2 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
-                        (_hero.TilePosition.X == (sprite.Position / 64).X + 2 && _hero.TilePosition.Y == (sprite.Position / 64).Y + 1) ||
-                        (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
-                        (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X + 1) ||
-                        (_hero.TilePosition.Y == (sprite.Position / 64).Y + 2 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
-                        (_hero.TilePosition.Y == (sprite.Position / 64).Y + 2 && _hero.TilePosition.X == (sprite.Position / 64).X + 1)) _GearWarn.Play();
-                        }
-
                         if ((_hero.TilePosition.X == (sprite.Position / 64).X - 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
-                            (_hero.TilePosition.X == (sprite.Position / 64).X + 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
-                            (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
-                            (_hero.TilePosition.Y == (sprite.Position / 64).Y + 1 && _hero.TilePosition.X == (sprite.Position / 64).X))
+                                     (_hero.TilePosition.X == (sprite.Position / 64).X + 1 && _hero.TilePosition.Y == (sprite.Position / 64).Y) ||
+                                     (_hero.TilePosition.Y == (sprite.Position / 64).Y - 1 && _hero.TilePosition.X == (sprite.Position / 64).X) ||
+                                     (_hero.TilePosition.Y == (sprite.Position / 64).Y + 1 && _hero.TilePosition.X == (sprite.Position / 64).X))
                         {
-
+                            if (sprite.Name == "LightDweller") _StalkerWarn.Play();
 
                             if ((sprite.Name == "NightVisionSprite" && !((NightVisionSprite)sprite).Collected) ||
-                                (sprite.Name == "LanternSprite" && !((LanternSprite)sprite).Collected) ||
-                                (sprite.Name == "FlashLightSprite" && !((FlashlightSprite)sprite).Collected) ||
-                                (sprite.Name == "CameraSprite" && !((CameraSprite)sprite).Collected)) _PickupWarn.Play();
+                                    (sprite.Name == "LanternSprite" && !((LanternSprite)sprite).Collected) ||
+                                    (sprite.Name == "FlashLightSprite" && !((FlashlightSprite)sprite).Collected) ||
+                                    (sprite.Name == "MedicPickup" && !((MedicPickup)sprite).Collected) ||
+                                    (sprite.Name == "CameraSprite" && !((CameraSprite)sprite).Collected)) _PickupWarn.Play();
 
-                            if (sprite.Name == "Torch" || (sprite.Name == "Exit" && _exit.Open)) _ObjectiveWarn.Play();
+                            if (sprite.Name == "Torch" || (sprite.Name == "Exit" && _exit.Open) || sprite.Name == "FlameKey") _ObjectiveWarn.Play();
                         }
 
                         if (_backgroundSprite.IsHaz((int)_hero.TilePosition.X + 1, (int)_hero.TilePosition.Y) ||
                             _backgroundSprite.IsHaz((int)_hero.TilePosition.X - 1, (int)_hero.TilePosition.Y) ||
                             _backgroundSprite.IsHaz((int)_hero.TilePosition.X, (int)_hero.TilePosition.Y - 1) ||
-                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X, (int)_hero.TilePosition.Y + 1)) _SpikeWarn.Play(0.125f, 0, 0);
+                            _backgroundSprite.IsHaz((int)_hero.TilePosition.X, (int)_hero.TilePosition.Y + 1)) _GlassWarn.Play(.125f, 0, 0);
+
 
                     }
                     SFX = false;
                 }
+
 
                 Vector2 XY = _hero.Position / _backgroundSprite._tileWidth;
 
@@ -662,18 +513,23 @@ namespace DungeonDweller.Screens
                         if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
                         {
                             ScreenManager.GameSaveState.CurrHealth--;
-                            if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState.CurrHealth = ScreenManager.GameSaveState.MaxHealth;
+                            if (ScreenManager.GameSaveState.CurrHealth <= 0) ScreenManager.GameSaveState.CurrHealth = ScreenManager.GameSaveState.MaxHealth;
+
 
                             HeroHealth--;
-                            _SpikeHurt.Play();
+
+                            if (_backgroundSprite._map[(int)_hero.TilePosition.X, (int)_hero.TilePosition.Y] == 3) _SpikeHurt.Play();
+                            else _VentHurt.Play();
+
                             _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
                         }
                     }
                 }
 
-                if (LanterLeft == 0 && !_exit.Open)
+                if (!_exit.Open && KeyLeft == 0 && TorchLeft == 0)
                 {
                     _exit.Open = true;
+
                     _DoorOpen.Play();
                 }
 
@@ -713,7 +569,7 @@ namespace DungeonDweller.Screens
             if (_pauseAction.Occurred(input, ControllingPlayer, out player) || gamePadDisconnected)
             {
                 ScreenManager.Game.Components.Remove(rain);
-                ScreenManager.AddScreen(new PauseMenuScreen(2), ControllingPlayer);
+                ScreenManager.AddScreen(new PauseMenuScreen(6), ControllingPlayer);
 
             }
 
@@ -749,12 +605,13 @@ namespace DungeonDweller.Screens
             foreach (ISprite s in _GameplaySprites) s.Draw(gameTime, spriteBatch);
             _darkTileset.Draw(gameTime, spriteBatch);
             foreach (ISprite s in _UISprites) s.Draw(gameTime, spriteBatch);
+            _exit.Draw(gameTime, spriteBatch);
 
 
             spriteBatch.Draw(_UIBackground, new Vector2(0, 1280), Color.White);
 
 
-            string title = "Rocky Road";
+            string title = "Light Research Vault";
 
             spriteBatch.DrawString(_gameFont, title, new Vector2(640, _gameFont.MeasureString(title).Y / 2), Color.White, 0, _gameFont.MeasureString(title) / 2, 1.5f, SpriteEffects.None, 0);
             spriteBatch.DrawString(_gameFont, HeroHealth.ToString() + "/" + MaxHeroHealth.ToString(), new Vector2(640, 1280 + 55), Color.Crimson, 0, _gameFont.MeasureString(HeroHealth.ToString() + "/" + MaxHeroHealth.ToString()) / 2, 4f, SpriteEffects.None, 0);
@@ -1062,7 +919,7 @@ namespace DungeonDweller.Screens
                                     ((FlameKey)Collection[j]).Collected = true;
                                 }
                                 _Objective.Play();
-                                //KeyLeft--;
+                                KeyLeft--;
                             }
                         }
                         if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "CameraSprite" || Collection[j].Name == "CameraSprite")))
@@ -1149,32 +1006,63 @@ namespace DungeonDweller.Screens
 
                                     if (!((Torch)Collection[i]).Active)
                                     {
-                                        LanterLeft--;
+
                                         ((Torch)Collection[i]).Active = true;
                                         _Objective.Play();
+                                        TorchLeft--;
                                     }
                                 }
                                 else
                                 {
                                     if (!((Torch)Collection[j]).Active)
                                     {
-                                        LanterLeft--;
+
                                         ((Torch)Collection[j]).Active = true;
                                         _Objective.Play();
+                                        TorchLeft--;
+
 
                                     }
                                 }
                             }
                         }
-                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "Exit" || Collection[j].Name == "Exit")))
+                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "FireOrb" || Collection[j].Name == "FireOrb")))
                         {
                             if (_exit.Open)
                             {
-                                
+
                                     OnLevelEnd();
                                 
-                                
 
+
+                            }
+                        }
+                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "DarkDweller" || Collection[j].Name == "DarkDweller")))
+                        {
+                            if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
+                            {
+                                if (_inputManager.Active)
+                                {
+                                    ScreenManager.GameSaveState.CurrHealth--;
+                                    if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState = ScreenManager.Load();
+                                    HeroHealth--;
+                                    _VentHurt.Play();
+                                    _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
+                                }
+                            }
+                        }
+                        if (((Collection[i].Name == "Hero" || Collection[j].Name == "Hero") && (Collection[i].Name == "LightDweller" || Collection[j].Name == "LightDweller")))
+                        {
+                            if (_DamageTimer <= gameTime.TotalGameTime.TotalSeconds)
+                            {
+                                if (_inputManager.Active)
+                                {
+                                    ScreenManager.GameSaveState.CurrHealth--;
+                                    if (ScreenManager.GameSaveState.CurrHealth < 0) ScreenManager.GameSaveState = ScreenManager.Load();
+                                    HeroHealth--;
+                                    _VentHurt.Play();
+                                    _DamageTimer = (float)gameTime.TotalGameTime.TotalSeconds + 5f;
+                                }
                             }
                         }
                     }
@@ -1185,10 +1073,13 @@ namespace DungeonDweller.Screens
         private void OnLevelEnd()
         {
             ScreenManager.Game.Components.Remove(rain);
-            ScreenManager.GameSaveState.Level = 3;
             ScreenManager.Save(ScreenManager.GameSaveState);
-            ScreenManager.AddScreen(new Level3(), ControllingPlayer);
-            ExitScreen();
+            _inputManager.Active = false;
+            ScreenManager.AddScreen(new VictoryScreen(), ControllingPlayer);
+
+
         }
+
+
     }
 }
